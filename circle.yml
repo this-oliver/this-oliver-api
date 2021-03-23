@@ -1,0 +1,39 @@
+version: 2.1 # use CircleCI 2.1
+dependencies:
+  cache_directories:
+    - mongodb-linux-x86_64-ubuntu1204-3.2.0
+  pre:
+    - if [[ ! -d mongodb-linux-x86_64-ubuntu1204-3.2.0 ]]; then wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1204-3.2.0.tgz && tar xvzf mongodb-linux-x86_64-ubuntu1204-3.2.0.tgz; fi
+    - sudo stop mongodb
+    - sudo cp mongodb-linux-x86_64-ubuntu1204-3.2.0/bin/* /usr/bin
+    - sudo start mongodb
+machine:
+  services:
+    - mongodb
+jobs: # a collection of steps
+  build: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/mern-starter # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/node:10.16.3 # ...with this image as the primary container; this is where all `steps` will run
+      - image: mongo:4.2.0 # and this image as the secondary service container
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+      - run:
+          name: update-npm
+          command: "sudo npm install -g npm@latest"
+      - restore_cache: # special step to restore the dependency cache
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-npm-wee
+          command: npm install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: "Setup custom environment variables"
+          command: echo 'export JWT_SECRET="SECRET_FOR_AUTH"' >> $BASH_ENV && echo 'export DB_URI="URI_FOR_DB"' >> $BASH_ENV
+      - run: # run tests
+          name: test
+          command: npm test
