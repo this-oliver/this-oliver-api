@@ -58,6 +58,13 @@ exports.getAllExperiences = async () => {
 };
 
 exports.getSingleExperience = async (id) => {
+	if (!id) {
+		throw {
+			status: 400,
+			message: "missing id",
+		};
+	}
+
 	try {
 		let xp = await ExperienceSchema.findById(id).exec();
 
@@ -78,9 +85,18 @@ exports.getSingleExperience = async (id) => {
 };
 
 exports.updateExperience = async (id, patch) => {
-	try {
-		let xp = await this.getSingleExperience(id);
+	let xp = null;
 
+	try {
+		xp = await this.getSingleExperience(id);
+	} catch (error) {
+		throw {
+			status: error.status,
+			message: error.message,
+		};
+	}
+
+	try {
 		xp.title = patch.title || xp.title;
 		xp.org = patch.org || xp.org;
 		xp.startYear = patch.startYear || xp.startYear;
@@ -92,8 +108,8 @@ exports.updateExperience = async (id, patch) => {
 		return xp;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: 400,
+			message: error,
 		};
 	}
 };
