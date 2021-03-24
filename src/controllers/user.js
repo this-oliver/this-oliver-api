@@ -29,8 +29,8 @@ exports.getAllUsers = async function (req, res) {
 };
 
 exports.getSingleUser = async function (req, res) {
-	let user = null;
 	let id = req.params.id;
+	let user = null;
 
 	try {
 		user = await User.getSingleUser(id);
@@ -55,7 +55,7 @@ exports.patchUser = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		if (id !== decoded.data) {
+		if (id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
@@ -82,7 +82,7 @@ exports.deleteUser = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		if (id !== decoded.data) {
+		if (id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",

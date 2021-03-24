@@ -35,7 +35,15 @@ exports.login = async (email, password) => {
 		};
 	}
 
-	return user;
+	try {
+		user = await this.getSingleUser(user._id);
+		return user;
+	} catch (error) {
+		throw {
+			status: error.status,
+			message: error.message || error,
+		};
+	}
 };
 
 exports.postUser = async (name, email, password) => {

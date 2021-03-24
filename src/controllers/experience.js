@@ -50,9 +50,9 @@ exports.patchExperience = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		let xp = ExperienceData.getSingleExperience(xpId);
+		let xp = await ExperienceData.getSingleExperience(xpId);
 
-		if (xp.author !== decoded.data) {
+		if (xp.author != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
@@ -63,7 +63,7 @@ exports.patchExperience = async function (req, res) {
 	}
 
 	try {
-		let xp = await ExperienceData.updateExperience(id, patch);
+		let xp = await ExperienceData.updateExperience(xpId, patch);
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
