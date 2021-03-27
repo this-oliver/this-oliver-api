@@ -3,7 +3,7 @@ let express = require("express");
 let cors = require("cors");
 let bodyParser = require("body-parser");
 
-let router = require("./controllers/router");
+let router = require("./router");
 
 let app = express();
 

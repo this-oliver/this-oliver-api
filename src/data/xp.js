@@ -1,5 +1,5 @@
 // mongo
-const ExperienceSchema = require("../models/experience");
+const ExperienceSchema = require("../models/xp");
 const UserData = require("./user");
 
 exports.postExperience = async (
