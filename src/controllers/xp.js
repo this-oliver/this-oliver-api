@@ -1,4 +1,4 @@
-const ExperienceData = require("../data/experience");
+const ExperienceData = require("../data/xp");
 const TokenHelper = require("../helpers/token");
 
 exports.postExperience = async function (req, res, next) {
@@ -21,7 +21,7 @@ exports.postExperience = async function (req, res, next) {
 	}
 };
 
-exports.getAllExperience = function (req, res) {
+exports.getAllExperiences = function (req, res) {
 	try {
 		let xp = ExperienceData.getAllExperiences();
 		return res.status(200).send(xp);

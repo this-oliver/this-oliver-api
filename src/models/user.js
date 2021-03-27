@@ -17,6 +17,7 @@ let user = new Schema(
 			long: { type: String, default: "" },
 		},
 		experiences: [{ type: Schema.Types.ObjectId, ref: "experience" }],
+		articles: [{ type: Schema.Types.ObjectId, ref: "article" }],
 		salt: { type: String },
 	},
 	{ timestamps: true }
