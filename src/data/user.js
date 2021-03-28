@@ -87,10 +87,6 @@ exports.getAllUsers = async () => {
 		let users = await User.find()
 			.select("-password -salt")
 			.populate("experiences")
-			.populate({
-				path: "articles",
-				populate: { path: "author tags" },
-			})
 			.exec();
 		return users;
 	} catch (error) {
@@ -106,10 +102,6 @@ exports.getSingleUser = async (id) => {
 		let user = await User.findOne({ _id: id })
 			.select("-password -salt")
 			.populate("experiences")
-			.populate({
-				path: "articles",
-				populate: { path: "author tags" },
-			})
 			.exec();
 		return user;
 	} catch (error) {

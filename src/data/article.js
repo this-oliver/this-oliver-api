@@ -53,7 +53,45 @@ exports.postArticle = async (userId, title, content, tags) => {
 
 exports.getAllArticles = async () => {
 	try {
-		return await ArticleSchema.find().populate("author tags").exec();
+		return await ArticleSchema.find()
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1,
+				},
+			})
+			.exec();
+	} catch (error) {
+		throw {
+			status: 400,
+			message: error.message || error,
+		};
+	}
+};
+
+exports.getUserArticles = async (id) => {
+	if (!id) {
+		throw {
+			status: 400,
+			message: "missing id",
+		};
+	}
+
+	try {
+		return await ArticleSchema.find({ author: id })
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1,
+				},
+			})
+			.exec();
 	} catch (error) {
 		throw {
 			status: 400,
@@ -72,7 +110,15 @@ exports.getSingleArticle = async (id) => {
 
 	try {
 		let article = await ArticleSchema.findById(id)
-			.populate("author tags")
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1,
+				},
+			})
 			.exec();
 
 		if (!article) {
