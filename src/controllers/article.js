@@ -29,6 +29,16 @@ exports.getAllArticles = async function (req, res) {
 	}
 };
 
+exports.getUserArticles = async function (req, res) {
+	let userId = req.params.userId;
+	try {
+		let articles = await ArticleData.getUserArticles(userId);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
 exports.getAllTags = async function (req, res) {
 	try {
 		let tags = await TagData.getAllTags();

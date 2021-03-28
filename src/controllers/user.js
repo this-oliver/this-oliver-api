@@ -29,7 +29,7 @@ exports.getAllUsers = async function (req, res) {
 };
 
 exports.getSingleUser = async function (req, res) {
-	let id = req.params.id;
+	let id = req.params.userId;
 	let user = null;
 
 	try {
@@ -46,7 +46,7 @@ exports.getSingleUser = async function (req, res) {
 };
 
 exports.patchUser = async function (req, res) {
-	let id = req.params.id;
+	let id = req.params.userId;
 	let user = null;
 	let patch = req.body;
 
@@ -75,7 +75,7 @@ exports.patchUser = async function (req, res) {
 };
 
 exports.deleteUser = async function (req, res) {
-	let id = req.params.id;
+	let id = req.params.userId;
 
 	try {
 		let decoded = TokenHelper.verifyToken(
