@@ -27,12 +27,11 @@ Router.get(BaseRoute, (req, res) => {
 /* ==== Token Not Required (Public) ==== */
 // auth
 Router.post(`${BaseRoute}/auth/login`, AuthController.loginUser);
-Router.post(`${BaseRoute}/auth/register`, UserController.postUser);
+Router.post(`${BaseRoute}/auth/register`, AuthController.registerUser);
 //users
-Router.post(`${BaseRoute}/users`, UserController.postUser);
 Router.get(`${BaseRoute}/users`, UserController.getAllUsers);
 Router.get(`${BaseRoute}/users/:userId`, UserController.getSingleUser);
-Router.get(`${BaseRoute}/users/:userId/articles`, ArticleController.getUserArticles);
+Router.get(`${BaseRoute}/users/:userId/articles`, UserController.getUserArticles);
 // articles
 Router.get(`${BaseRoute}/articles`, ArticleController.getAllArticles);
 Router.get(`${BaseRoute}/articles/:articleId`, ArticleController.getSingleArticle);
@@ -44,10 +43,12 @@ Router.patch(`${BaseRoute}/auth/password`, AuthController.resetPassword);
 Router.patch(`${BaseRoute}/users/:userId`, UserController.patchUser);
 Router.post(`${BaseRoute}/users/:userId/experiences`, XpController.postExperience);
 Router.post(`${BaseRoute}/users/:userId/articles`, ArticleController.postArticle);
+Router.get(`${BaseRoute}/users/:userId/secret-articles`, UserController.getSecretUserArticles);
 // experiences
 Router.patch(`${BaseRoute}/experiences/:xpId`, XpController.patchExperience);
 Router.delete(`${BaseRoute}/experiences/:xpId`, XpController.deleteExperience);
 // articles
+Router.get(`${BaseRoute}/secret-articles/:articleId`, ArticleController.getSecretSingleArticle);
 Router.patch(`${BaseRoute}/articles/:articleId`, ArticleController.patchArticle);
 Router.delete(`${BaseRoute}/articles/:articleId`, ArticleController.deleteArticle);
 

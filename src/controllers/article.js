@@ -1,5 +1,4 @@
 const ArticleData = require("../data/article");
-const TagData = require("../data/tag");
 
 const TokenHelper = require("../helpers/token");
 
@@ -12,7 +11,8 @@ exports.postArticle = async function (req, res, next) {
 			userId,
 			data.title,
 			data.content,
-			data.tags
+			data.tags,
+			data.publish
 		);
 		return res.status(201).send(article);
 	} catch (error) {
@@ -29,32 +29,43 @@ exports.getAllArticles = async function (req, res) {
 	}
 };
 
-exports.getUserArticles = async function (req, res) {
-	let userId = req.params.userId;
-	try {
-		let articles = await ArticleData.getUserArticles(userId);
-		return res.status(200).send(articles);
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-};
-
-exports.getAllTags = async function (req, res) {
-	try {
-		let tags = await TagData.getAllTags();
-		return res.status(200).send(tags);
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-};
-
 exports.getSingleArticle = async function (req, res) {
 	let articleId = req.params.articleId;
 
 	try {
 		let article = await ArticleData.getSingleArticle(articleId);
 		return res.status(200).send(article);
+		
 	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.getSecretSingleArticle = async function (req, res) {
+	let articleId = req.params.articleId;
+
+	try {
+		let decoded = TokenHelper.verifyToken(
+			req.headers.authorization.split(" ")[1]
+		);
+
+		let article = await ArticleData.getSingleArticle(articleId, true);
+		if (article.author._id != decoded.data) {
+			throw {
+				status: 401,
+				message: "invalid credentials",
+			};
+		}
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+
+	try {
+		let article = await ArticleData.getSingleArticle(articleId, true);
+		return res.status(200).send(article);
+		
+	} catch (error) {
+		console.log(error)
 		return res.status(error.status).send(error.message);
 	}
 };
@@ -68,9 +79,8 @@ exports.patchArticle = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		let article = await ArticleData.getSingleArticle(articleId);
-
-		if (article.author != decoded.data) {
+		let article = await ArticleData.getSingleArticle(articleId, true);
+		if (article.author._id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
@@ -79,7 +89,7 @@ exports.patchArticle = async function (req, res) {
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
-
+	
 	try {
 		let article = await ArticleData.updateArticle(articleId, patch);
 		return res.status(200).send(article);
@@ -96,9 +106,9 @@ exports.deleteArticle = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		let article = await ArticleData.getSingleArticle(articleId);
+		let article = await ArticleData.getSingleArticle(articleId, true);
 
-		if (article.author != decoded.data) {
+		if (article.author._id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
