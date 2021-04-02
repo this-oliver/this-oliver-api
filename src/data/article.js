@@ -56,23 +56,27 @@ exports.getAllArticles = async (showSecrets = false) => {
 	try {
 		let articles = showSecrets
 			? await ArticleSchema.find()
-			: await ArticleSchema.find({ publish: true });
-
-		if (articles.length > 0) {
-			return articles;
-		}
-
-		articles = articles
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1,
-				},
-			})
-			.exec();
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec()
+			: await ArticleSchema.find({ publish: true })
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec();
 
 		return articles;
 	} catch (error) {
@@ -94,7 +98,29 @@ exports.getSingleArticle = async (id, showSecrets = false) => {
 	try {
 		let article = showSecrets
 			? await ArticleSchema.findById(id)
-			: await ArticleSchema.findOne({ _id: id, publish: true });
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec()
+			: await ArticleSchema.findOne({ _id: id })
+					.where("publish")
+					.equals(true)
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec();
 
 		if (!article) {
 			throw {
@@ -102,15 +128,6 @@ exports.getSingleArticle = async (id, showSecrets = false) => {
 				message: `article with id ${id} does not exist`,
 			};
 		}
-
-		article.populate("tags").populate({
-			path: "author",
-			select: {
-				_id: 1,
-				name: 1,
-				email: 1,
-			},
-		});
 
 		return article;
 	} catch (error) {
@@ -132,23 +149,29 @@ exports.getUserArticles = async (id, showSecrets = false) => {
 	try {
 		let articles = showSecrets
 			? await ArticleSchema.find({ author: id })
-			: await ArticleSchema.find({ author: id, publish: true });
-
-		if (articles.length > 0) {
-			return articles;
-		}
-
-		articles = articles.populate("tags").populate({
-			path: "author",
-			select: {
-				_id: 1,
-				name: 1,
-				email: 1,
-			},
-		});
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec()
+			: await ArticleSchema.find({ author: id, publish: true })
+					.populate("tags")
+					.populate({
+						path: "author",
+						select: {
+							_id: 1,
+							name: 1,
+							email: 1,
+						},
+					})
+					.exec();
 
 		return articles;
-		
 	} catch (error) {
 		throw {
 			status: 400,
