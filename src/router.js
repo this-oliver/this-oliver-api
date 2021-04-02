@@ -48,6 +48,7 @@ Router.get(`${BaseRoute}/users/:userId/secret-articles`, UserController.getSecre
 Router.patch(`${BaseRoute}/experiences/:xpId`, XpController.patchExperience);
 Router.delete(`${BaseRoute}/experiences/:xpId`, XpController.deleteExperience);
 // articles
+Router.get(`${BaseRoute}/secret-articles/:articleId`, ArticleController.getSecretSingleArticle);
 Router.patch(`${BaseRoute}/articles/:articleId`, ArticleController.patchArticle);
 Router.delete(`${BaseRoute}/articles/:articleId`, ArticleController.deleteArticle);
 
