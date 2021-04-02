@@ -1,26 +1,14 @@
 // data
-const User = require("../data/user");
+const UserData = require("../data/user");
+const ArticleData = require("../data/article");
 // helpers
 const TokenHelper = require("../helpers/token");
-
-exports.postUser = async function (req, res, next) {
-	let data = req.body;
-	let user = null;
-
-	try {
-		user = await User.postUser(data.name, data.email, data.password);
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-
-	return res.status(201).send(user);
-};
 
 exports.getAllUsers = async function (req, res) {
 	let users = null;
 
 	try {
-		users = await User.getAllUsers();
+		users = await UserData.getAllUsers();
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
@@ -29,24 +17,65 @@ exports.getAllUsers = async function (req, res) {
 };
 
 exports.getSingleUser = async function (req, res) {
-	let id = req.params.userId;
+	let userId = req.params.userId;
 	let user = null;
 
 	try {
-		user = await User.getSingleUser(id);
+		user = await UserData.getSingleUser(userId);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
 
 	if (user === null) {
-		return res.status(404).send(`user ${id} not found`);
+		return res.status(404).send(`user ${userId} not found`);
 	} else {
 		return res.status(200).send(user);
 	}
 };
 
+exports.getUserArticles = async function (req, res) {
+	let userId = req.params.userId;
+
+	try {
+		let articles = await ArticleData.getUserArticles(userId);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.getSecretUserArticles = async function (req, res) {
+	let userId = req.params.userId;
+	let user = null;
+
+	try {
+		let decoded = TokenHelper.verifyToken(
+			req.headers.authorization.split(" ")[1]
+		);
+
+		user = await UserData.getSingleUser(userId);
+
+		if (user._id != decoded.data) {
+			throw {
+				status: 401,
+				message: "invalid credentials",
+			};
+		}
+
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+
+	try {
+		let articles = await ArticleData.getUserArticles(user._id, true);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
 exports.patchUser = async function (req, res) {
-	let id = req.params.userId;
+	let userId = req.params.userId;
 	let user = null;
 	let patch = req.body;
 
@@ -55,18 +84,21 @@ exports.patchUser = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		if (id != decoded.data) {
+		user = await UserData.getSingleUser(userId);
+		
+		if (user._id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
 			};
 		}
+
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
 
 	try {
-		user = await User.updateUser(id, patch);
+		user = await UserData.updateUser(user._id, patch);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
@@ -75,22 +107,25 @@ exports.patchUser = async function (req, res) {
 };
 
 exports.deleteUser = async function (req, res) {
-	let id = req.params.userId;
+	let userId = req.params.userId;
+	let user = null;
 
 	try {
 		let decoded = TokenHelper.verifyToken(
 			req.headers.authorization.split(" ")[1]
 		);
 
-		if (id != decoded.data) {
+		user = await UserData.getSingleUser(userId);
+		
+		if (user._id != decoded.data) {
 			throw {
 				status: 401,
 				message: "invalid credentials",
 			};
 		}
 
-		await User.deleteUser(id);
-		return res.status(200).send(`deleted ${id}`);
+		await UserData.deleteUser(user._id);
+		return res.status(200).send(`deleted ${userId}`);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}

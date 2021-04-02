@@ -2,9 +2,6 @@
 const TagSchema = require("../models/tag");
 
 exports.createTag = async (name) => {
-	console.log({
-		tagName: name,
-	});
 	try {
 		let tag = await TagSchema.create(new TagSchema({ name: name }));
 		return tag;
@@ -23,10 +20,6 @@ exports.cleanTags = async (dirtyList) => {
 			message: "tags are missing",
 		};
 	}
-
-	console.log({
-		dirtyList: dirtyList,
-	});
 
 	try {
 		let cleanList = []; // list of tags

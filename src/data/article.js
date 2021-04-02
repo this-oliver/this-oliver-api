@@ -3,7 +3,7 @@ const ArticleSchema = require("../models/article");
 const UserData = require("./user");
 const TagData = require("./tag");
 
-exports.postArticle = async (userId, title, content, tags) => {
+exports.postArticle = async (userId, title, content, tags, publish) => {
 	let user = null;
 
 	// get user
@@ -36,6 +36,7 @@ exports.postArticle = async (userId, title, content, tags) => {
 				author: user._id,
 				content: content,
 				tags: tagList,
+				publish: publish,
 			})
 		);
 
@@ -51,9 +52,17 @@ exports.postArticle = async (userId, title, content, tags) => {
 	}
 };
 
-exports.getAllArticles = async () => {
+exports.getAllArticles = async (showSecrets = false) => {
 	try {
-		return await ArticleSchema.find()
+		let articles = showSecrets
+			? await ArticleSchema.find()
+			: await ArticleSchema.find({ publish: true });
+
+		if (articles.length > 0) {
+			return articles;
+		}
+
+		articles = articles
 			.populate("tags")
 			.populate({
 				path: "author",
@@ -64,6 +73,8 @@ exports.getAllArticles = async () => {
 				},
 			})
 			.exec();
+
+		return articles;
 	} catch (error) {
 		throw {
 			status: 400,
@@ -72,7 +83,7 @@ exports.getAllArticles = async () => {
 	}
 };
 
-exports.getUserArticles = async (id) => {
+exports.getSingleArticle = async (id, showSecrets = false) => {
 	if (!id) {
 		throw {
 			status: 400,
@@ -81,45 +92,9 @@ exports.getUserArticles = async (id) => {
 	}
 
 	try {
-		return await ArticleSchema.find({ author: id })
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1,
-				},
-			})
-			.exec();
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message || error,
-		};
-	}
-};
-
-exports.getSingleArticle = async (id) => {
-	if (!id) {
-		throw {
-			status: 400,
-			message: "missing id",
-		};
-	}
-
-	try {
-		let article = await ArticleSchema.findById(id)
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1,
-				},
-			})
-			.exec();
+		let article = showSecrets
+			? await ArticleSchema.findById(id)
+			: await ArticleSchema.findOne({ _id: id, publish: true });
 
 		if (!article) {
 			throw {
@@ -127,6 +102,15 @@ exports.getSingleArticle = async (id) => {
 				message: `article with id ${id} does not exist`,
 			};
 		}
+
+		article.populate("tags").populate({
+			path: "author",
+			select: {
+				_id: 1,
+				name: 1,
+				email: 1,
+			},
+		});
 
 		return article;
 	} catch (error) {
@@ -137,11 +121,47 @@ exports.getSingleArticle = async (id) => {
 	}
 };
 
+exports.getUserArticles = async (id, showSecrets = false) => {
+	if (!id) {
+		throw {
+			status: 400,
+			message: "missing id",
+		};
+	}
+
+	try {
+		let articles = showSecrets
+			? await ArticleSchema.find({ author: id })
+			: await ArticleSchema.find({ author: id, publish: true });
+
+		if (articles.length > 0) {
+			return articles;
+		}
+
+		articles = articles.populate("tags").populate({
+			path: "author",
+			select: {
+				_id: 1,
+				name: 1,
+				email: 1,
+			},
+		});
+
+		return articles;
+		
+	} catch (error) {
+		throw {
+			status: 400,
+			message: error.message || error,
+		};
+	}
+};
+
 exports.updateArticle = async (id, patch) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id);
+		article = await this.getSingleArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status,
@@ -153,13 +173,15 @@ exports.updateArticle = async (id, patch) => {
 		article.title = patch.title || article.title;
 		article.author = patch.author || article.author;
 		article.content = patch.content || article.content;
+		article.publish = patch.publish || article.publish;
 
 		if (patch.tags) {
 			article.tags = await TagData.cleanTags(patch.tags);
 		}
 
 		article = await article.save();
-		return xp;
+
+		return article;
 	} catch (error) {
 		throw {
 			status: 400,
@@ -170,7 +192,7 @@ exports.updateArticle = async (id, patch) => {
 
 exports.deleteArticle = async (id) => {
 	try {
-		let xp = await this.getSingleArticle(id);
+		let xp = await this.getSingleArticle(id, true);
 		xp = await xp.remove();
 
 		return `${xp.title} with id ${id} deleted`;

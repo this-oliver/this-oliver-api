@@ -6,8 +6,9 @@ let article = new Schema(
 	{
 		/* general */
 		title: { type: String, required: true },
-		author: { type: Schema.Types.ObjectId, ref: "user" },
 		content: { type: String, required: true },
+		publish: { type: String, default: false },
+		author: { type: Schema.Types.ObjectId, ref: "user" },
 		tags: [{ type: Schema.Types.ObjectId, ref: "tag" }],
 	},
 	{ timestamps: true }

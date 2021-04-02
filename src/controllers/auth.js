@@ -20,6 +20,19 @@ exports.loginUser = async function (req, res, next) {
 	return next();
 };
 
+exports.registerUser = async function (req, res, next) {
+	let data = req.body;
+	let user = null;
+
+	try {
+		user = await UserData.postUser(data.name, data.email, data.password);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+
+	return res.status(201).send(user);
+};
+
 exports.resetPassword = async function (req, res, next) {
 	let oldPassword = req.body.oldPassword;
 	let newPassword = req.body.newPassword;
