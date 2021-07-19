@@ -2,7 +2,7 @@ require("dotenv").config();
 let app = require("./app");
 let db = require("./database");
 
-let port = process.env.PORT || 3000;
+let port = process.env.PORT || 3001;
 
 db.connect().catch((error) => {
 	console.error(error);
