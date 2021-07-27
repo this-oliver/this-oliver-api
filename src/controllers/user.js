@@ -49,9 +49,7 @@ exports.getSecretUserArticles = async function (req, res) {
 	let user = null;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 
@@ -80,9 +78,7 @@ exports.patchUser = async function (req, res) {
 	let patch = req.body;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 		
@@ -111,9 +107,7 @@ exports.deleteUser = async function (req, res) {
 	let user = null;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 		

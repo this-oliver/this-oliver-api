@@ -2,18 +2,18 @@ const ArticleData = require("../data/article");
 
 const TokenHelper = require("../helpers/token");
 
-exports.postArticle = async function (req, res, next) {
-	let userId = req.params.userId;
+exports.postArticle = async function (req, res) {
 	let data = req.body;
+	let userId = null;
 
 	try {
-		let article = await ArticleData.postArticle(
-			userId,
-			data.title,
-			data.content,
-			data.tags,
-			data.publish
-		);
+		userId = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+
+	try {
+		let article = await ArticleData.postArticle(userId, data.title, data.content, data.tags, data.publish);
 		return res.status(201).send(article);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -45,9 +45,7 @@ exports.getSecretSingleArticle = async function (req, res) {
 	let articleId = req.params.articleId;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		let article = await ArticleData.getSingleArticle(articleId, true);
 		if (article.author._id != decoded.data) {
@@ -65,7 +63,7 @@ exports.getSecretSingleArticle = async function (req, res) {
 		return res.status(200).send(article);
 		
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		return res.status(error.status).send(error.message);
 	}
 };
@@ -75,9 +73,7 @@ exports.patchArticle = async function (req, res) {
 	let patch = req.body;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		let article = await ArticleData.getSingleArticle(articleId, true);
 		if (article.author._id != decoded.data) {
@@ -102,9 +98,7 @@ exports.deleteArticle = async function (req, res) {
 	let articleId = req.params.articleId;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		let article = await ArticleData.getSingleArticle(articleId, true);
 

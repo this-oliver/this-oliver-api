@@ -1,20 +1,18 @@
 const ExperienceData = require("../data/xp");
 const TokenHelper = require("../helpers/token");
 
-exports.postExperience = async function (req, res, next) {
-	let userId = req.params.userId;
+exports.postExperience = async function (req, res) {
+	let userId = null;
 	let data = req.body;
 
 	try {
-		let xp = await ExperienceData.postExperience(
-			userId,
-			data.title,
-			data.org,
-			data.startYear,
-			data.endYear,
-			data.description,
-			data.type
-		);
+		userId = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+
+	try {
+		let xp = await ExperienceData.postExperience(userId, data.title, data.org, data.startYear, data.endYear, data.description, data.type);
 		return res.status(201).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -46,9 +44,7 @@ exports.patchExperience = async function (req, res) {
 	let patch = req.body;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		let xp = await ExperienceData.getSingleExperience(xpId);
 
@@ -74,9 +70,7 @@ exports.deleteExperience = async function (req, res) {
 	let xpId = req.params.xpId;
 
 	try {
-		let decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		let xp = await ExperienceData.getSingleExperience(xpId);
 
