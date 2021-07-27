@@ -25,5 +25,18 @@ exports.models = {
 			}
 			return users;
 		}
-	}, 
+	},
+	createArticle: (
+		author,
+		publish,
+		title = "test title",
+		content = "content for stuff to test"
+	) => {
+		return {
+			title: title,
+			content: content,
+			author: author,
+			publish: publish,
+		};
+	},
 };

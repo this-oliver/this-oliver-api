@@ -1,85 +1,6 @@
 // mongo
 const User = require("../models/user");
 
-exports.login = async (email, password) => {
-	let user;
-
-	try {
-		user = await User.findOne({ email: email.toLowerCase() });
-
-		if (user == null) {
-			throw {
-				status: 404,
-				message: "invalid login details", 
-			};
-		}
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message || error, 
-		};
-	}
-
-	try {
-		const isMatch = await user.verifyPassword(password);
-		if (!isMatch) {
-			throw {
-				status: 404,
-				message: "invalid token", 
-			};
-		}
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message || error, 
-		};
-	}
-
-	try {
-		user = await this.getSingleUser(user._id);
-		return user;
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message || error, 
-		};
-	}
-};
-
-exports.postUser = async (name, email, password) => {
-	try {
-		const users = await this.getAllUsers();
-
-		if (users.length > 0) {
-			throw {
-				status: 400,
-				message: "sorry buddy but there can only be one user in this server 🤪", 
-			};
-		}
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message, 
-		};
-	}
-
-	try {
-		const user = await User.create(new User({
-			name: name,
-			email: email,
-			password: password, 
-		}));
-
-		const result = this.getSingleUser(user._id);
-		return Promise.resolve(result);
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message || error, 
-		};
-	}
-};
-
 exports.getAllUsers = async () => {
 	try {
 		const users = await User.find()
@@ -91,6 +12,43 @@ exports.getAllUsers = async () => {
 		throw {
 			status: error.status || 400,
 			message: error.message || error, 
+		};
+	}
+};
+
+exports.getUser = async () => {
+	try {
+		const user = await User.findOne()
+			.select("-password -salt")
+			.populate("experiences")
+			.populate({
+				path: "articles",
+				match: { publish: true },
+			})
+			.exec();
+
+		return user;
+	} catch (error) {
+		throw {
+			status: error.status || 400,
+			message: error.message || error,
+		};
+	}
+};
+
+exports.getAdmin = async () => {
+	try {
+		const user = await User.findOne()
+			.select("-password -salt")
+			.populate("experiences")
+			.populate("articles")
+			.exec();
+
+		return user;
+	} catch (error) {
+		throw {
+			status: error.status || 400,
+			message: error.message || error,
 		};
 	}
 };

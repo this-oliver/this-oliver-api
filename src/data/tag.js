@@ -15,10 +15,7 @@ exports.createTag = async (name) => {
 
 exports.cleanTags = async (dirtyList) => {
 	if (!dirtyList) {
-		throw {
-			status: 400,
-			message: "tags are missing", 
-		};
+		return [];
 	}
 
 	try {

@@ -41,32 +41,6 @@ exports.getSingleArticle = async function (req, res) {
 	}
 };
 
-exports.getSecretSingleArticle = async function (req, res) {
-	const articleId = req.params.articleId;
-
-	try {
-		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
-
-		const article = await ArticleData.getSingleArticle(articleId, true);
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials", 
-			};
-		}
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-
-	try {
-		const article = await ArticleData.getSingleArticle(articleId, true);
-		return res.status(200).send(article);
-		
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-};
-
 exports.patchArticle = async function (req, res) {
 	const articleId = req.params.articleId;
 	const patch = req.body;

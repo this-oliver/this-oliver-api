@@ -10,6 +10,7 @@ Chai.use(ChaiAsPromise);
 // data
 const UserSchema = require("../../src/models/user");
 const User = require("../../src/data/user");
+const Auth = require("../../src/data/auth");
 
 // helpers
 const Factory = require("../factory");
@@ -30,15 +31,15 @@ describe("User in Models", function () {
 
 		it("post valid user", async function () {
 			const dummy = Factory.models.createUsers();
-			await User.postUser(dummy.name, dummy.email, dummy.password);
+			await Auth.register(dummy.name, dummy.email, dummy.password);
 			const user = await UserSchema.findOne({ email: dummy.email });
 			Expect(user.name).to.equal(dummy.name);
 		});
 
 		it("should not post user with existing email", async function () {
 			const user = Factory.models.createUsers();
-			await User.postUser(user.name, user.email, user.password);
-			const registerUser = User.postUser(user.name, user.email, user.password);
+			await Auth.register(user.name, user.email, user.password);
+			const registerUser = Auth.register(user.name, user.email, user.password);
 			await Expect(registerUser).to.be.rejectedWith({
 				status: 400,
 				message: "User already exists",
@@ -46,7 +47,7 @@ describe("User in Models", function () {
 		});
 
 		it("should not post user without name/email/password", async function () {
-			await Expect(User.postUser("", "", "")).to.be.rejectedWith({
+			await Expect(Auth.register("", "", "")).to.be.rejectedWith({
 				status: 400,
 				message: "user values are invalid",
 			});
@@ -94,7 +95,7 @@ describe("User in Models", function () {
 		it("update valid user should return updated user", async function () {
 			const factoryUsers = Factory.models.createUsers(2);
 
-			const user = await User.postUser(
+			const user = await Auth.register(
 				factoryUsers[0].name,
 				factoryUsers[0].email,
 				factoryUsers[0].password
