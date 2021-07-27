@@ -1,34 +1,33 @@
 require("dotenv").config();
-let express = require("express");
-let cors = require("cors");
-let bodyParser = require("body-parser");
+const express = require("express");
+const cors = require("cors");
 
-let router = require("./router");
+const router = require("./router");
 
-let app = express();
+const app = express();
 
 // Parse requests of content-type 'application/json'
 app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 if (process.env.NODE_ENV == "dev") {
-	let morgan = require("morgan");
+	const morgan = require("morgan");
 	app.use(morgan("dev"));
 }
 
 app.use(router);
 
-let env = app.get("env");
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
 	console.error(err.stack);
-	let err_res = {
+	
+	const err_res = {
 		message: err.message,
-		error: {},
+		error: {}, 
 	};
-	if (env.NODE_ENV == "dev") {
+
+	if (process.env.NODE_ENV == "dev") {
 		err_res.error = err;
 	}
+	
 	res.status(err.status || 500);
 	res.json(err_res);
 });

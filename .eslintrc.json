@@ -12,8 +12,11 @@
 	"rules": {
 		"indent": ["error", "tab"],
 		"semi": ["error", "always"],
-    "operator-linebreak": ["error", "after"],
-    "function-paren-newline": ["error", "never"],
-    "function-call-argument-newline": ["error", "never"]
+		"no-var": "error",
+		"prefer-const": "error",
+    "operator-linebreak": ["error", "none"],
+    "object-curly-spacing": ["error", "always"],
+    "object-curly-newline": ["error", { "multiline": true }]
+
 	}
 }

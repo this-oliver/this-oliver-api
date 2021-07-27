@@ -17,7 +17,7 @@ exports.getAllUsers = async function (req, res) {
 };
 
 exports.getSingleUser = async function (req, res) {
-	let userId = req.params.userId;
+	const userId = req.params.userId;
 	let user = null;
 
 	try {
@@ -34,10 +34,10 @@ exports.getSingleUser = async function (req, res) {
 };
 
 exports.getUserArticles = async function (req, res) {
-	let userId = req.params.userId;
+	const userId = req.params.userId;
 
 	try {
-		let articles = await ArticleData.getUserArticles(userId);
+		const articles = await ArticleData.getUserArticles(userId);
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -45,18 +45,18 @@ exports.getUserArticles = async function (req, res) {
 };
 
 exports.getSecretUserArticles = async function (req, res) {
-	let userId = req.params.userId;
+	const userId = req.params.userId;
 	let user = null;
 
 	try {
-		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 
 		if (user._id != decoded.data) {
 			throw {
 				status: 401,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 
@@ -65,27 +65,28 @@ exports.getSecretUserArticles = async function (req, res) {
 	}
 
 	try {
-		let articles = await ArticleData.getUserArticles(user._id, true);
+		const articles = await ArticleData.getUserArticles(user._id, true);
 		return res.status(200).send(articles);
+		
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
 };
 
 exports.patchUser = async function (req, res) {
-	let userId = req.params.userId;
+	const userId = req.params.userId;
 	let user = null;
-	let patch = req.body;
+	const patch = req.body;
 
 	try {
-		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 		
 		if (user._id != decoded.data) {
 			throw {
 				status: 401,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 
@@ -95,31 +96,32 @@ exports.patchUser = async function (req, res) {
 
 	try {
 		user = await UserData.updateUser(user._id, patch);
+		return res.status(200).send(user);
+
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
-
-	return res.status(200).send(user);
 };
 
 exports.deleteUser = async function (req, res) {
-	let userId = req.params.userId;
+	const userId = req.params.userId;
 	let user = null;
 
 	try {
-		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
 		user = await UserData.getSingleUser(userId);
 		
 		if (user._id != decoded.data) {
 			throw {
 				status: 401,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 
 		await UserData.deleteUser(user._id);
 		return res.status(200).send(`deleted ${userId}`);
+
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}

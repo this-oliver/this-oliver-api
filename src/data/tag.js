@@ -3,12 +3,12 @@ const TagSchema = require("../models/tag");
 
 exports.createTag = async (name) => {
 	try {
-		let tag = await TagSchema.create(new TagSchema({ name: name }));
+		const tag = await TagSchema.create(new TagSchema({ name: name }));
 		return tag;
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error,
+			message: error, 
 		};
 	}
 };
@@ -17,20 +17,20 @@ exports.cleanTags = async (dirtyList) => {
 	if (!dirtyList) {
 		throw {
 			status: 400,
-			message: "tags are missing",
+			message: "tags are missing", 
 		};
 	}
 
 	try {
-		let cleanList = []; // list of tags
-		let allTags = await this.getAllTags();
+		const cleanList = []; // list of tags
+		const allTags = await this.getAllTags();
 
 		for (let x = 0; x < dirtyList.length; x++) {
-			let dirtyTag = dirtyList[x];
+			const dirtyTag = dirtyList[x];
 			let found = false;
 
 			for (let i = 0; i < allTags.length; i++) {
-				let cleanTag = allTags[i];
+				const cleanTag = allTags[i];
 				if (dirtyTag.toLowerCase() == cleanTag.name.toLowerCase()) {
 					found = true;
 					cleanList.push(cleanTag._id);
@@ -39,7 +39,7 @@ exports.cleanTags = async (dirtyList) => {
 			}
 
 			if (!found) {
-				let newTag = await this.createTag(dirtyTag);
+				const newTag = await this.createTag(dirtyTag);
 				cleanList.push(newTag._id);
 			}
 		}
@@ -47,8 +47,8 @@ exports.cleanTags = async (dirtyList) => {
 		return cleanList;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 };
@@ -59,7 +59,7 @@ exports.getAllTags = async () => {
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error,
+			message: error, 
 		};
 	}
 };
@@ -68,26 +68,17 @@ exports.getSingleTag = async (id) => {
 	if (!id) {
 		throw {
 			status: 400,
-			message: "missing id",
+			message: "missing id", 
 		};
 	}
 
 	try {
-		let tag = await TagSchema.findById(id).exec();
+		const tag = await TagSchema.findById(id).exec();
 		return tag;
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error,
-		};
-	}
-};
-
-exports.updateTag = async (id, patch) => {
-	if (!id) {
-		throw {
-			status: 400,
-			message: "missing id",
+			message: error, 
 		};
 	}
 };
@@ -100,8 +91,8 @@ exports.deleteTag = async (id) => {
 		return `${tag.title} with id ${id} deleted`;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };

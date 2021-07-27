@@ -10,28 +10,28 @@ exports.login = async (email, password) => {
 		if (user == null) {
 			throw {
 				status: 404,
-				message: "invalid login details",
+				message: "invalid login details", 
 			};
 		}
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 
 	try {
-		let isMatch = await user.verifyPassword(password);
+		const isMatch = await user.verifyPassword(password);
 		if (!isMatch) {
 			throw {
 				status: 404,
-				message: "invalid token",
+				message: "invalid token", 
 			};
 		}
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 
@@ -40,51 +40,49 @@ exports.login = async (email, password) => {
 		return user;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
 
 exports.postUser = async (name, email, password) => {
 	try {
-		let users = await this.getAllUsers();
+		const users = await this.getAllUsers();
 
 		if (users.length > 0) {
 			throw {
 				status: 400,
-				message: "sorry buddy but there can only be one user in this server 🤪",
+				message: "sorry buddy but there can only be one user in this server 🤪", 
 			};
 		}
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
 	try {
-		let user = await User.create(
-			new User({
-				name: name,
-				email: email,
-				password: password,
-			})
-		);
+		const user = await User.create(new User({
+			name: name,
+			email: email,
+			password: password, 
+		}));
 
-		let result = this.getSingleUser(user._id);
+		const result = this.getSingleUser(user._id);
 		return Promise.resolve(result);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
 
 exports.getAllUsers = async () => {
 	try {
-		let users = await User.find()
+		const users = await User.find()
 			.select("-password -salt")
 			.populate("experiences")
 			.exec();
@@ -92,22 +90,22 @@ exports.getAllUsers = async () => {
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
 
 exports.getSingleUser = async (id) => {
 	try {
-		let user = await User.findOne({ _id: id })
+		const user = await User.findOne({ _id: id })
 			.select("-password -salt")
 			.populate("experiences")
 			.exec();
 		return user;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
@@ -119,16 +117,16 @@ exports.updateUser = async (id, patch) => {
 		if (user == null)
 			throw {
 				status: 404,
-				message: `user ${id} does not exist`,
+				message: `user ${id} does not exist`, 
 			};
 
 		if (patch.email && patch.email !== user.email) {
-			let emailExists = await User.findOne({ email: patch.email }).exec();
+			const emailExists = await User.findOne({ email: patch.email }).exec();
 
 			if (emailExists) {
 				throw {
 					status: 404,
-					message: `${patch.email} already exists`,
+					message: `${patch.email} already exists`, 
 				};
 			}
 
@@ -136,15 +134,18 @@ exports.updateUser = async (id, patch) => {
 		}
 
 		user.name = patch.name || user.name;
-		user.bio.short = patch.bio.short || user.bio.short;
-		user.bio.long = patch.bio.long || user.bio.long;
+		
+		if(patch.bio){
+			user.bio.short = patch.bio.short || user.bio.short;
+			user.bio.long = patch.bio.long || user.bio.long;
+		}
 
 		user = await user.save();
 		return user;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
@@ -152,11 +153,11 @@ exports.updateUser = async (id, patch) => {
 exports.updateUserPassword = async (userId, oldPwd, newPwd) => {
 	try {
 		let user = await User.findOne({ _id: userId });
-		let match = await user.verifyPassword(oldPwd);
+		const match = await user.verifyPassword(oldPwd);
 		if (!match) {
 			throw {
 				status: 400,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 
@@ -167,20 +168,20 @@ exports.updateUserPassword = async (userId, oldPwd, newPwd) => {
 		return user;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
 
 exports.deleteUser = async (id) => {
 	try {
-		let user = await this.getSingleUser(id);
+		const user = await this.getSingleUser(id);
 
 		if (user == null) {
 			throw {
 				status: 404,
-				message: `user ${id} doesn't exists`,
+				message: `user ${id} doesn't exists`, 
 			};
 		}
 		await user.remove();
@@ -188,8 +189,8 @@ exports.deleteUser = async (id) => {
 		return `${id} deleted`;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };

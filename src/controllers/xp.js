@@ -3,7 +3,7 @@ const TokenHelper = require("../helpers/token");
 
 exports.postExperience = async function (req, res) {
 	let userId = null;
-	let data = req.body;
+	const data = req.body;
 
 	try {
 		userId = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
@@ -12,7 +12,7 @@ exports.postExperience = async function (req, res) {
 	}
 
 	try {
-		let xp = await ExperienceData.postExperience(userId, data.title, data.org, data.startYear, data.endYear, data.description, data.type);
+		const xp = await ExperienceData.postExperience(userId, data.title, data.org, data.startYear, data.endYear, data.description, data.type);
 		return res.status(201).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -21,7 +21,7 @@ exports.postExperience = async function (req, res) {
 
 exports.getAllExperiences = function (req, res) {
 	try {
-		let xp = ExperienceData.getAllExperiences();
+		const xp = ExperienceData.getAllExperiences();
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -29,10 +29,10 @@ exports.getAllExperiences = function (req, res) {
 };
 
 exports.getSingleExperience = function (req, res) {
-	let xpId = req.params.xpId;
+	const xpId = req.params.xpId;
 
 	try {
-		let xp = ExperienceData.getSingleExperience(xpId);
+		const xp = ExperienceData.getSingleExperience(xpId);
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -40,18 +40,18 @@ exports.getSingleExperience = function (req, res) {
 };
 
 exports.patchExperience = async function (req, res) {
-	let xpId = req.params.xpId;
-	let patch = req.body;
+	const xpId = req.params.xpId;
+	const patch = req.body;
 
 	try {
-		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		let xp = await ExperienceData.getSingleExperience(xpId);
+		const xp = await ExperienceData.getSingleExperience(xpId);
 
 		if (xp.author != decoded.data) {
 			throw {
 				status: 401,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 	} catch (error) {
@@ -59,7 +59,7 @@ exports.patchExperience = async function (req, res) {
 	}
 
 	try {
-		let xp = await ExperienceData.updateExperience(xpId, patch);
+		const xp = await ExperienceData.updateExperience(xpId, patch);
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -67,17 +67,17 @@ exports.patchExperience = async function (req, res) {
 };
 
 exports.deleteExperience = async function (req, res) {
-	let xpId = req.params.xpId;
+	const xpId = req.params.xpId;
 
 	try {
-		let decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		let xp = await ExperienceData.getSingleExperience(xpId);
+		const xp = await ExperienceData.getSingleExperience(xpId);
 
 		if (xp.author != decoded.data) {
 			throw {
 				status: 401,
-				message: "invalid credentials",
+				message: "invalid credentials", 
 			};
 		}
 	} catch (error) {
@@ -85,7 +85,7 @@ exports.deleteExperience = async function (req, res) {
 	}
 
 	try {
-		let xp = await ExperienceData.deleteExperience(xpId);
+		const xp = await ExperienceData.deleteExperience(xpId);
 		return res.status(203).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
