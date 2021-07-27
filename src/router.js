@@ -20,15 +20,14 @@ Router.get(BaseRoute, (req, res) => {
 
 // auth
 Router.post(`${BaseRoute}/auth/login`, AuthController.loginUser);
-Router.post(`${BaseRoute}/auth/register`, AuthController.registerUser);
+Router.post(`${BaseRoute}/auth/register`, AuthController.registerUser); // note: only one user allowed in this api :P
 /* Token Required */ Router.patch(`${BaseRoute}/auth/password`, AuthController.resetPassword);
 
 // users
-Router.get(`${BaseRoute}/users`, UserController.getAllUsers);
-Router.get(`${BaseRoute}/users/:userId`, UserController.getSingleUser);
-Router.get(`${BaseRoute}/users/:userId/articles`, UserController.getUserArticles);
-/* Token Required */ Router.patch(`${BaseRoute}/users/:userId`, UserController.patchUser);
-/* Token Required */ Router.get(`${BaseRoute}/users/:userId/articles/secret`, UserController.getSecretUserArticles);
+Router.get(`${BaseRoute}/user`, UserController.getSingleUser);
+Router.get(`${BaseRoute}/user/:userId/articles`, UserController.getUserArticles);
+/* Token Required */ Router.patch(`${BaseRoute}/user/:userId`, UserController.patchUser);
+/* Token Required */ Router.get(`${BaseRoute}/user/:userId/articles/secret`, UserController.getSecretUserArticles);
 
 // experiences
 /* Token Required */ Router.post(`${BaseRoute}/experiences`, XpController.postExperience);
