@@ -4,32 +4,20 @@ const ArticleData = require("../data/article");
 // helpers
 const TokenHelper = require("../helpers/token");
 
-exports.getAllUsers = async function (req, res) {
-	let users = null;
+exports.getUser = async function (req, res) {
 
 	try {
-		users = await UserData.getAllUsers();
+		const userList = await UserData.getAllUsers();
+		const user = userList.pop();
+		
+		if (!user) {
+			return res.status(404).send("user not found");
+		} else {
+			return res.status(200).send(user);
+		}
+
 	} catch (error) {
 		return res.status(error.status).send(error.message);
-	}
-
-	return res.status(200).send(users);
-};
-
-exports.getSingleUser = async function (req, res) {
-	const userId = req.params.userId;
-	let user = null;
-
-	try {
-		user = await UserData.getSingleUser(userId);
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-
-	if (user === null) {
-		return res.status(404).send(`user ${userId} not found`);
-	} else {
-		return res.status(200).send(user);
 	}
 };
 

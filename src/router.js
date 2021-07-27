@@ -22,7 +22,7 @@ Router.post("/api/auth/register", AuthController.registerUser); // note: only on
 /* Token Required */ Router.patch("/api/auth/password", AuthController.resetPassword);
 
 // users
-Router.get("/api/user", UserController.getSingleUser);
+Router.get("/api/user", UserController.getUser);
 Router.get("/api/user/:userId/articles", UserController.getUserArticles);
 /* Token Required */ Router.patch("/api/user/:userId", UserController.patchUser);
 /* Token Required */ Router.get("/api/user/:userId/articles/secret", UserController.getSecretUserArticles);

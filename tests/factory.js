@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 exports.mongo = {
 	createObjectId: () => {
 		return mongoose.Types.ObjectId();
-	},
+	}, 
 };
 
 exports.models = {
@@ -15,7 +15,7 @@ exports.models = {
 				password: "password",
 			};
 		} else {
-			let users = [];
+			const users = [];
 			for (let i = 0; i < num; i++) {
 				users.push({
 					name: `user${i}`,
@@ -25,5 +25,5 @@ exports.models = {
 			}
 			return users;
 		}
-	},
+	}, 
 };
