@@ -1,63 +1,28 @@
 // server and database
 const App = require("../../src/app");
-const DB = require("../../src/database");
+const Database = require("../../src/database");
 
 // framework
-const chai = require("chai");
-const expect = chai.expect;
+const Chai = require("chai");
+const Expect = Chai.expect;
 const supertest = require("supertest");
-const request = supertest(App);
+const Request = supertest(App);
 
 // data
 const UserSchema = require("../../src/models/user");
+const ArticleData = require("../../src/data/article");
 
 // helpers
-const TokenHelper = require("../../src/helpers/token");
 const Factory = require("../factory");
-const JsonConverter = require("../json");
 
 describe("User in MiddleWare", function () {
 	before(async function () {
-		await DB.connect();
+		await Database.connect();
 	});
 
 	after(async function () {
 		await UserSchema.deleteMany({});
-		await DB.disconnect();
-	});
-
-	describe("[POST]", function () {
-		beforeEach(async function () {
-			await UserSchema.deleteMany({});
-		});
-
-		it("post valid user should return 201 and user", async function () {
-			let factoryUser = Factory.models.createUsers();
-			let res = await request.post("/api/users").send(factoryUser).expect(201);
-			let user = JsonConverter.parseTextIntoJson(res.text);
-			expect(user.name).to.equal(factoryUser.name);
-		});
-
-		it("post invalid user fields should return 400", async function () {
-			await request
-				.post("/api/users")
-				.send({ email: "", name: "", password: "" })
-				.expect(400);
-		});
-
-		it("post user with existing email should return 400", async function () {
-			let factoryUser = Factory.models.createUsers();
-			await UserSchema.create(factoryUser);
-
-			await request
-				.post("/api/users")
-				.send({
-					email: factoryUser.email,
-					name: "bob Test",
-					password: "bob pa55word",
-				})
-				.expect(400);
-		});
+		await Database.disconnect();
 	});
 
 	describe("[GET]", function () {
@@ -65,94 +30,58 @@ describe("User in MiddleWare", function () {
 			await UserSchema.deleteMany({});
 		});
 
-		it("get user by id should return 200 and user", async function () {
-			let factoryUser = Factory.models.createUsers();
-			let user = await UserSchema.create(factoryUser);
-			let token = TokenHelper.getToken(user._id);
-			let response = await request
-				.get("/api/users/" + user._id)
-				.set("Authorization", `bearer ${token}`)
-				.expect(200);
-			let body = JsonConverter.parseTextIntoJson(response.text);
-			expect(body.name).to.equal(user.name);
-			expect(body.email).to.equal(user.email);
+		it("get user should return 200 and user", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const response = await Request.get(`/api/user`).expect(200);
+
+			const body = response.body;
+			Expect(body.name).to.equal(user.name);
+			Expect(body.email).to.equal(user.email);
 		});
 
-		it("get all users should return 200 and array of users", async function () {
-			let factoryUsers = Factory.models.createUsers(5);
-			let users = await UserSchema.create(factoryUsers);
-			let token = TokenHelper.getToken(users[0]._id);
-			let response = await request
-				.get("/api/users/")
-				.set("Authorization", `bearer ${token}`)
-				.expect(200);
-			let body = JsonConverter.parseTextIntoJson(response.text);
-			expect(body.length).to.equal(5);
-		});
-	});
+		it("get user should not return articles that haven't been published", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
 
-	describe("[PATCH]", function () {
-		beforeEach(async function () {
-			await UserSchema.deleteMany({});
-		});
+			const factoryPublishedArticle = Factory.models.createArticle(
+				user._id,
+				true,
+				"publsihed article"
+			);
+			const factorySecretArticle = Factory.models.createArticle(
+				user._id,
+				false,
+				"not publsihed article"
+			);
 
-		it("patch valid user id should return 200 and updated user", async function () {
-			let factoryUsers = Factory.models.createUsers(2);
+			try {
+				await ArticleData.postArticle(
+					factoryPublishedArticle.author,
+					factoryPublishedArticle.title,
+					factoryPublishedArticle.content,
+					null,
+					factoryPublishedArticle.publish
+				);
+				
+				await ArticleData.postArticle(
+					factorySecretArticle.author,
+					factorySecretArticle.title,
+					factorySecretArticle.content,
+					null,
+					factorySecretArticle.publish
+				);
+			} catch (error) {
+				console.log({ error });
+			}
 
-			let user1 = await UserSchema.create(factoryUsers[0]);
-			let token = TokenHelper.getToken(user1._id);
+			const response = await Request.get(`/api/user`).expect(200);
 
-			let user2 = factoryUsers[1];
-			let patch = { name: user2.name, email: user2.email };
-
-			let response = await request
-				.patch("/api/users/" + user1._id)
-				.set("Authorization", `bearer ${token}`)
-				.send(patch)
-				.expect(200);
-
-			let body = JsonConverter.parseTextIntoJson(response.text);
-			expect(body.name).to.equal(patch.name);
-			expect(body.email).to.equal(patch.email);
-		});
-
-		it("patch user with invalid token should return 401", async function () {
-			let factoryObjectId = Factory.mongo.createObjectId();
-			let patch = {};
-			await request
-				.patch("/api/users/" + factoryObjectId)
-				.set("Authorization", `bearer ${0}`)
-				.send(patch)
-				.expect(401);
-		});
-	});
-
-	describe("[DELETE]", function () {
-		beforeEach(async function () {
-			await UserSchema.deleteMany({});
-		});
-
-		it("delete valid user id should return 200", async function () {
-			let factoryUser = Factory.models.createUsers();
-			let user = await UserSchema.create(factoryUser);
-			let token = TokenHelper.getToken(user._id);
-			expect(await UserSchema.countDocuments({})).to.equal(1);
-
-			await request
-				.delete("/api/users/" + user._id)
-				.set("Authorization", `bearer ${token}`)
-				.expect(200);
-		});
-
-		it("delete invalid user id should return 401", async function () {
-			let factoryUser = Factory.models.createUsers();
-			let user = await UserSchema.create(factoryUser);
-			let token = TokenHelper.getToken(user._id);
-			let invalidUserId = "x";
-			await request
-				.delete("/api/users/" + invalidUserId)
-				.set("Authorization", `bearer ${token}`)
-				.expect(401);
+			const body = response.body;
+			Expect(body.name).to.equal(user.name);
+			Expect(body.email).to.equal(user.email);
+			Expect(body.articles.length).to.equal(1);
 		});
 	});
 });

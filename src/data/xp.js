@@ -2,38 +2,34 @@
 const ExperienceSchema = require("../models/xp");
 const UserData = require("./user");
 
-exports.postExperience = async (
-	userId,
+exports.postExperience = async (userId,
 	title,
 	org,
 	startYear,
 	endYear,
 	description,
-	type
-) => {
+	type) => {
 	let user = null;
 
 	try {
 		user = await UserData.getSingleUser(userId);
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
 	try {
-		let xp = await ExperienceSchema.create(
-			new ExperienceSchema({
-				title: title,
-				org: org,
-				startYear: startYear,
-				endYear: endYear,
-				description: description,
-				type: type,
-				author: userId,
-			})
-		);
+		const xp = await ExperienceSchema.create(new ExperienceSchema({
+			title: title,
+			org: org,
+			startYear: startYear,
+			endYear: endYear,
+			description: description,
+			type: type,
+			author: userId, 
+		}));
 
 		user.experiences.push(xp);
 		await user.save();
@@ -41,7 +37,7 @@ exports.postExperience = async (
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
@@ -52,7 +48,7 @@ exports.getAllExperiences = async () => {
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
@@ -61,25 +57,25 @@ exports.getSingleExperience = async (id) => {
 	if (!id) {
 		throw {
 			status: 400,
-			message: "missing id",
+			message: "missing id", 
 		};
 	}
 
 	try {
-		let xp = await ExperienceSchema.findById(id).exec();
+		const xp = await ExperienceSchema.findById(id).exec();
 
 		if (!xp) {
 			throw {
 				status: 404,
-				message: `experienc with id ${id} does not exist`,
+				message: `experienc with id ${id} does not exist`, 
 			};
 		}
 
 		return xp;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
@@ -91,8 +87,8 @@ exports.updateExperience = async (id, patch) => {
 		xp = await this.getSingleExperience(id);
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
@@ -109,7 +105,7 @@ exports.updateExperience = async (id, patch) => {
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error,
+			message: error, 
 		};
 	}
 };
@@ -122,8 +118,8 @@ exports.deleteExperience = async (id) => {
 		return `${xp.title} with id ${id} deleted`;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };

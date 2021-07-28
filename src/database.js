@@ -1,27 +1,20 @@
 require("dotenv").config();
-let db = require("mongoose");
+const db = require("mongoose");
 
-let mongoURI = "";
-switch (process.env.NODE_ENV) {
-	case "dev":
-		mongoURI = "mongodb://localhost:27017/oli";
-		break;
-	case "test":
-		mongoURI = "mongodb://localhost:27017/oli_test";
-		break;
-	default:
-		mongoURI = process.env.DB_URI;
-		break;
-}
-process.env.MONGODB = mongoURI;
+process.env.MONGODB =	process.env.NODE_ENV === "test"		? process.env.DB_URI_TEST		: process.env.DB_URI;
 
-let connect = async () => {
+const connect = async () => {
 	return await db.connect(
-		mongoURI,
-		{ useNewUrlParser: true, useUnifiedTopology: true },
+		process.env.MONGODB,
+		{
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		},
 		function (err) {
 			if (err) {
-				console.error("Failed to connect to MongoDB with URI: " + mongoURI);
+				console.error(
+					`Failed to connect to MongoDB with URI: ${process.env.MONGODB}`
+				);
 				console.error(err.stack);
 				process.exit(1);
 			}
@@ -29,11 +22,11 @@ let connect = async () => {
 	);
 };
 
-let connection = () => {
+const connection = () => {
 	return db.connection;
 };
 
-let disconnect = async () => {
+const disconnect = async () => {
 	return await db.disconnect();
 };
 

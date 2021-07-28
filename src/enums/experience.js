@@ -2,7 +2,7 @@ const EXPERIENCES = {
 	job: "job",
 	education: "education",
 	projects: "projects",
-	other: "other",
+	other: "other", 
 };
 
-export default EXPERIENCES;
+module.exports = EXPERIENCES;

@@ -1,12 +1,9 @@
 // data
-let Mongoose = require("mongoose");
-let Schema = Mongoose.Schema;
+const Mongoose = require("mongoose");
+const Schema = Mongoose.Schema;
 
-let tag = new Schema(
-	{
-		/* general */
-		name: { type: String, required: true, unique: true },
-	},
+const tag = new Schema(
+	{ name: { type: String, required: true, unique: true } },
 	{ timestamps: true }
 );
 

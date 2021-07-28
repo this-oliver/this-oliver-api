@@ -2,54 +2,47 @@
 // eslint-disable-next-line max-len
 
 const Router = require("express").Router();
-const BodyParser = require("body-parser");
 
 const AuthController = require("./controllers/auth");
+const AdminController = require("./controllers/admin");
 const UserController = require("./controllers/user");
 const XpController = require("./controllers/xp");
 const ArticleController = require("./controllers/article");
-
-Router.use(BodyParser.urlencoded({ extended: false }));
-Router.use(BodyParser.json());
-
-const BaseRoute = "/api";
 
 Router.get("/", (req, res) => {
 	return res.status(200).send("welcome to olivermanzi's api");
 });
 
-Router.get(BaseRoute, (req, res) => {
+Router.get("/api", (req, res) => {
 	return res.status(200).send("root");
 });
 
-//* ROUTES
-
-/* ==== Token Not Required (Public) ==== */
 // auth
-Router.post(`${BaseRoute}/auth/login`, AuthController.loginUser);
-Router.post(`${BaseRoute}/auth/register`, AuthController.registerUser);
-//users
-Router.get(`${BaseRoute}/users`, UserController.getAllUsers);
-Router.get(`${BaseRoute}/users/:userId`, UserController.getSingleUser);
-Router.get(`${BaseRoute}/users/:userId/articles`, UserController.getUserArticles);
-// articles
-Router.get(`${BaseRoute}/articles`, ArticleController.getAllArticles);
-Router.get(`${BaseRoute}/articles/:articleId`, ArticleController.getSingleArticle);
+Router.post("/api/auth/login", AuthController.login);
+Router.post("/api/auth/register", AuthController.register); // note: only one user allowed in this api :P
 
-/* ==== Token Required (Private) ==== */
-// auth
-Router.patch(`${BaseRoute}/auth/password`, AuthController.resetPassword);
+// admin
+/* Token Required */ Router.get("/api/admin", AdminController.getAdmin);
+/* Token Required */ Router.get("/api/admin/articles", AdminController.getArticles);
+/* Token Required */ Router.get("/api/admin/articles/:id", AdminController.getSingleArticle);
+/* Token Required */ Router.patch("/api/admin", AdminController.patchAdmin);
+/* Token Required */ Router.patch("/api/auth/password", AdminController.resetPassword);
+
 // user
-Router.patch(`${BaseRoute}/users/:userId`, UserController.patchUser);
-Router.post(`${BaseRoute}/users/:userId/experiences`, XpController.postExperience);
-Router.post(`${BaseRoute}/users/:userId/articles`, ArticleController.postArticle);
-Router.get(`${BaseRoute}/users/:userId/secret-articles`, UserController.getSecretUserArticles);
+Router.get("/api/user", UserController.getUser);
+Router.get("/api/user/articles", UserController.getUserArticles);
+
 // experiences
-Router.patch(`${BaseRoute}/experiences/:xpId`, XpController.patchExperience);
-Router.delete(`${BaseRoute}/experiences/:xpId`, XpController.deleteExperience);
+/* Token Required */ Router.post("/api/experiences", XpController.postExperience);
+/* Token Required */ Router.patch("/api/experiences/:id", XpController.patchExperience);
+/* Token Required */ Router.delete("/api/experiences/:id", XpController.deleteExperience);
+
 // articles
-Router.get(`${BaseRoute}/secret-articles/:articleId`, ArticleController.getSecretSingleArticle);
-Router.patch(`${BaseRoute}/articles/:articleId`, ArticleController.patchArticle);
-Router.delete(`${BaseRoute}/articles/:articleId`, ArticleController.deleteArticle);
+Router.get("/api/articles", ArticleController.getAllArticles);
+Router.get("/api/articles/:id", ArticleController.getSingleArticle);
+/* Token Required */ Router.post("/api/articles", ArticleController.postArticle);
+/* Token Required */ Router.patch("/api/articles/:id", ArticleController.patchArticle);
+/* Token Required */ Router.delete("/api/articles/:id", ArticleController.deleteArticle);
 
 module.exports = Router;
+

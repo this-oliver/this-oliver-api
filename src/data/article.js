@@ -11,8 +11,8 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 		user = await UserData.getSingleUser(userId);
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
@@ -23,22 +23,20 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 		tagList = await TagData.cleanTags(tags);
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
 	// create article
 	try {
-		let article = await ArticleSchema.create(
-			new ArticleSchema({
-				title: title,
-				author: user._id,
-				content: content,
-				tags: tagList,
-				publish: publish,
-			})
-		);
+		const article = await ArticleSchema.create(new ArticleSchema({
+			title: title,
+			author: user._id,
+			content: content,
+			tags: tagList,
+			publish: publish, 
+		}));
 
 		user.articles.push(article._id);
 		await user.save();
@@ -47,42 +45,40 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 	} catch (error) {
 		throw {
 			status: error.status || 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
 
 exports.getAllArticles = async (showSecrets = false) => {
 	try {
-		let articles = showSecrets
-			? await ArticleSchema.find()
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec()
-			: await ArticleSchema.find({ publish: true })
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec();
+		const articles = showSecrets ?			await ArticleSchema.find()
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec() :			await ArticleSchema.find({ publish: true })
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec();
 
 		return articles;
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
@@ -91,49 +87,47 @@ exports.getSingleArticle = async (id, showSecrets = false) => {
 	if (!id) {
 		throw {
 			status: 400,
-			message: "missing id",
+			message: "missing id", 
 		};
 	}
 
 	try {
-		let article = showSecrets
-			? await ArticleSchema.findById(id)
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec()
-			: await ArticleSchema.findOne({ _id: id })
-					.where("publish")
-					.equals(true)
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec();
+		const article = showSecrets ?			await ArticleSchema.findById(id)
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec() :			await ArticleSchema.findOne({ _id: id })
+			.where("publish")
+			.equals(true)
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec();
 
 		if (!article) {
 			throw {
 				status: 404,
-				message: `article with id ${id} does not exist`,
+				message: `article with id ${id} does not exist`, 
 			};
 		}
 
 		return article;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };
@@ -142,40 +136,38 @@ exports.getUserArticles = async (id, showSecrets = false) => {
 	if (!id) {
 		throw {
 			status: 400,
-			message: "missing id",
+			message: "missing id", 
 		};
 	}
 
 	try {
-		let articles = showSecrets
-			? await ArticleSchema.find({ author: id })
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec()
-			: await ArticleSchema.find({ author: id, publish: true })
-					.populate("tags")
-					.populate({
-						path: "author",
-						select: {
-							_id: 1,
-							name: 1,
-							email: 1,
-						},
-					})
-					.exec();
+		const articles = showSecrets ?			await ArticleSchema.find({ author: id })
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec() :			await ArticleSchema.find({ author: id, publish: true })
+			.populate("tags")
+			.populate({
+				path: "author",
+				select: {
+					_id: 1,
+					name: 1,
+					email: 1, 
+				}, 
+			})
+			.exec();
 
 		return articles;
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error.message || error,
+			message: error.message || error, 
 		};
 	}
 };
@@ -187,8 +179,8 @@ exports.updateArticle = async (id, patch) => {
 		article = await this.getSingleArticle(id, true);
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message,
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 
@@ -208,7 +200,7 @@ exports.updateArticle = async (id, patch) => {
 	} catch (error) {
 		throw {
 			status: 400,
-			message: error,
+			message: error, 
 		};
 	}
 };
@@ -221,8 +213,8 @@ exports.deleteArticle = async (id) => {
 		return `${xp.title} with id ${id} deleted`;
 	} catch (error) {
 		throw {
-			status: error.status,
-			message: error.message || error,
+			status: error.status || 400,
+			message: error.message || error, 
 		};
 	}
 };

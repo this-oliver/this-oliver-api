@@ -5,12 +5,18 @@
 		"node": true,
 		"mocha": true
 	},
-	"extends": ["eslint:recommended", "prettier"],
+	"extends": ["eslint:recommended"],
 	"parserOptions": {
 		"ecmaVersion": 12
 	},
 	"rules": {
 		"indent": ["error", "tab"],
-		"semi": ["error", "always"]
+		"semi": ["error", "always"],
+		"no-var": "error",
+		"prefer-const": "error",
+    "operator-linebreak": ["error", "none"],
+    "object-curly-spacing": ["error", "always"],
+    "object-curly-newline": ["error", { "multiline": true }]
+
 	}
 }
