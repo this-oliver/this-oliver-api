@@ -61,7 +61,7 @@ exports.getArticles = async function (req, res) {
 };
 
 exports.getSingleArticle = async function (req, res) {
-	const articleId = req.params.articleId;
+	const articleId = req.params.id;
 
 	try {
 		const decoded = TokenHelper.verifyToken(

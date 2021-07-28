@@ -31,7 +31,7 @@ exports.getAllArticles = async function (req, res) {
 };
 
 exports.getSingleArticle = async function (req, res) {
-	const articleId = req.params.articleId;
+	const articleId = req.params.id;
 
 	try {
 		const article = await ArticleData.getSingleArticle(articleId);
@@ -43,7 +43,7 @@ exports.getSingleArticle = async function (req, res) {
 };
 
 exports.patchArticle = async function (req, res) {
-	const articleId = req.params.articleId;
+	const articleId = req.params.id;
 	const patch = req.body;
 
 	try {
@@ -69,7 +69,7 @@ exports.patchArticle = async function (req, res) {
 };
 
 exports.deleteArticle = async function (req, res) {
-	const articleId = req.params.articleId;
+	const articleId = req.params.id;
 
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);

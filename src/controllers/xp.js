@@ -31,7 +31,7 @@ exports.getAllExperiences = function (req, res) {
 };
 
 exports.getSingleExperience = function (req, res) {
-	const xpId = req.params.xpId;
+	const xpId = req.params.id;
 
 	try {
 		const xp = ExperienceData.getSingleExperience(xpId);
@@ -42,7 +42,7 @@ exports.getSingleExperience = function (req, res) {
 };
 
 exports.patchExperience = async function (req, res) {
-	const xpId = req.params.xpId;
+	const xpId = req.params.id;
 	const patch = req.body;
 
 	try {
@@ -69,7 +69,7 @@ exports.patchExperience = async function (req, res) {
 };
 
 exports.deleteExperience = async function (req, res) {
-	const xpId = req.params.xpId;
+	const xpId = req.params.id;
 
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);

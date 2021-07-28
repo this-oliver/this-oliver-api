@@ -34,15 +34,15 @@ Router.get("/api/user/articles", UserController.getUserArticles);
 
 // experiences
 /* Token Required */ Router.post("/api/experiences", XpController.postExperience);
-/* Token Required */ Router.patch("/api/experiences/:xpId", XpController.patchExperience);
-/* Token Required */ Router.delete("/api/experiences/:xpId", XpController.deleteExperience);
+/* Token Required */ Router.patch("/api/experiences/:id", XpController.patchExperience);
+/* Token Required */ Router.delete("/api/experiences/:id", XpController.deleteExperience);
 
 // articles
 Router.get("/api/articles", ArticleController.getAllArticles);
-Router.get("/api/articles/:articleId", ArticleController.getSingleArticle);
+Router.get("/api/articles/:id", ArticleController.getSingleArticle);
 /* Token Required */ Router.post("/api/articles", ArticleController.postArticle);
-/* Token Required */ Router.patch("/api/articles/:articleId", ArticleController.patchArticle);
-/* Token Required */ Router.delete("/api/articles/:articleId", ArticleController.deleteArticle);
+/* Token Required */ Router.patch("/api/articles/:id", ArticleController.patchArticle);
+/* Token Required */ Router.delete("/api/articles/:id", ArticleController.deleteArticle);
 
 module.exports = Router;
 
