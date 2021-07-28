@@ -7,7 +7,8 @@ exports.postArticle = async function (req, res) {
 	let userId = null;
 
 	try {
-		userId = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		userId = decoded.data;
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}

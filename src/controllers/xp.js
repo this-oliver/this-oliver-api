@@ -6,7 +6,9 @@ exports.postExperience = async function (req, res) {
 	const data = req.body;
 
 	try {
-		userId = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
+		userId = decoded.data;
+		
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}

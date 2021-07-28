@@ -121,10 +121,13 @@ exports.resetPassword = async function (req, res) {
 	const newPassword = req.body.newPassword;
 
 	try {
-		const user = TokenHelper.verifyToken(
+		const decoded = TokenHelper.verifyToken(
 			req.headers.authorization.split(" ")[1]
 		);
-		await UserData.changePassword(user._id, oldPassword, newPassword);
+
+		const userId = decoded.data;
+
+		await UserData.changePassword(userId, oldPassword, newPassword);
 		return res.status(200).send({});
 	} catch (error) {
 		return res.status(error.status || 500).send(error.message);
