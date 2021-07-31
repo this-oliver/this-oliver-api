@@ -10,7 +10,7 @@ exports.postExperience = async function (req, res) {
 		userId = decoded.data;
 		
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -57,7 +57,7 @@ exports.patchExperience = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -83,7 +83,7 @@ exports.deleteExperience = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {

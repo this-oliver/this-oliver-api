@@ -10,7 +10,7 @@ exports.postArticle = async function (req, res) {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 		userId = decoded.data;
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -58,11 +58,44 @@ exports.patchArticle = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 	
 	try {
 		const article = await ArticleData.updateArticle(articleId, patch);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleViews = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleViews(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleLikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleLikes(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleDislikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleDislikes(articleId);
 		return res.status(200).send(article);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -84,7 +117,7 @@ exports.deleteArticle = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {

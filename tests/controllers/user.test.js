@@ -84,4 +84,21 @@ describe("User in MiddleWare", function () {
 			Expect(body.articles.length).to.equal(1);
 		});
 	});
+
+	describe("[PATCH]", function () {
+		beforeEach(async function () {
+			await UserSchema.deleteMany({});
+		});
+
+		it("incrementing user visits should increase user visits by one and return 200 and user", async function () {
+			const factoryUser = Factory.models.createUsers();
+			await UserSchema.create(factoryUser);
+
+			const firstResponse = await Request.patch(`/api/user/visits`).expect(200);
+			Expect(firstResponse.body.visits).to.equal(1);
+			
+			const secondResponse = await Request.patch(`/api/user/visits`).expect(200);
+			Expect(secondResponse.body.visits).to.equal(2);
+		});
+	});
 });
