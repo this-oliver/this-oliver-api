@@ -251,33 +251,6 @@ exports.incrementArticleViews = async (id) => {
 	
 };
 
-exports.incrementArticleShares = async (id) => {
-	let article = null;
-
-	try {
-		article = await this.getSingleArticle(id, true);
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message,
-		};
-	}
-
-	try {
-		article.shares = article.shares + 1;
-		
-		article = await article.save();
-
-		return article;
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message,
-		};
-	}
-	
-};
-
 exports.incrementArticleLikes = async (id) => {
 	let article = null;
 
@@ -321,62 +294,6 @@ exports.incrementArticleDislikes = async (id) => {
 		article.dislikes = article.dislikes + 1;
 		
 		article = await article.save();
-
-		return article;
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message,
-		};
-	}
-	
-};
-
-exports.decrementArticleLikes = async (id) => {
-	let article = null;
-
-	try {
-		article = await this.getSingleArticle(id, true);
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message,
-		};
-	}
-
-	try {
-		if(article.likes > 0){
-			article.likes = article.likes - 1;
-			article = await article.save();
-		}
-
-		return article;
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message,
-		};
-	}
-	
-};
-
-exports.decrementArticleDislikes = async (id) => {
-	let article = null;
-
-	try {
-		article = await this.getSingleArticle(id, true);
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message,
-		};
-	}
-
-	try {
-		if (article.dislikes > 0) {
-			article.dislikes = article.dislikes - 1;
-			article = await article.save();
-		}
 
 		return article;
 	} catch (error) {

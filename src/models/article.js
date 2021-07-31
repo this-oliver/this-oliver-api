@@ -9,7 +9,6 @@ const article = new Schema(
 		author: { type: Schema.Types.ObjectId, ref: "user" },
 		publish: { type: Boolean, default: false },
 		views: { type: Number, default: 0 },
-		shares: { type: Number, default: 0 },
 		likes: { type: Number, default: 0 },
 		dislikes: { type: Number, default: 0 },
 		tags: [{ type: Schema.Types.ObjectId, ref: "tag" }],
