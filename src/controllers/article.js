@@ -10,7 +10,7 @@ exports.postArticle = async function (req, res) {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 		userId = decoded.data;
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -57,7 +57,7 @@ exports.patchArticle = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 	
 	try {
@@ -83,7 +83,7 @@ exports.deleteArticle = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {

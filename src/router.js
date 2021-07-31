@@ -20,13 +20,13 @@ Router.get("/api", (req, res) => {
 // auth
 Router.post("/api/auth/login", AuthController.login);
 Router.post("/api/auth/register", AuthController.register); // note: only one user allowed in this api :P
+/* Token Required */ Router.patch("/api/auth/password", AdminController.resetPassword);
 
 // admin
 /* Token Required */ Router.get("/api/admin", AdminController.getAdmin);
 /* Token Required */ Router.get("/api/admin/articles", AdminController.getArticles);
 /* Token Required */ Router.get("/api/admin/articles/:id", AdminController.getSingleArticle);
 /* Token Required */ Router.patch("/api/admin", AdminController.patchAdmin);
-/* Token Required */ Router.patch("/api/auth/password", AdminController.resetPassword);
 
 // user
 Router.get("/api/user", UserController.getUser);

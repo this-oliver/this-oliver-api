@@ -28,7 +28,7 @@ exports.getAdmin = async function (req, res) {
 
 		return res.status(200).send(user);
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 };
 
@@ -49,7 +49,7 @@ exports.getArticles = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -76,7 +76,7 @@ exports.getSingleArticle = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -105,7 +105,7 @@ exports.patchAdmin = async function (req, res) {
 			};
 		}
 	} catch (error) {
-		return res.status(error.status).send(error.message);
+		return res.status(error.status || 401).send(error.message);
 	}
 
 	try {
@@ -119,18 +119,31 @@ exports.patchAdmin = async function (req, res) {
 exports.resetPassword = async function (req, res) {
 	const oldPassword = req.body.oldPassword;
 	const newPassword = req.body.newPassword;
+	let user = null;
 
 	try {
 		const decoded = TokenHelper.verifyToken(
 			req.headers.authorization.split(" ")[1]
 		);
 
-		const userId = decoded.data;
+		user = await UserData.getSingleUser(decoded.data);
 
-		await UserData.changePassword(userId, oldPassword, newPassword);
+		if (user._id != decoded.data) {
+			throw {
+				status: 401,
+				message: "invalid credentials",
+			};
+		}
+
+	} catch (error) {
+		return res.status(error.status || 401).send(error.message);
+	}
+
+	try {
+		await UserData.changePassword(user._id, oldPassword, newPassword);
 		return res.status(200).send({});
 	} catch (error) {
-		return res.status(error.status || 500).send(error.message);
+		return res.status(error.status).send(error.message);
 	}
 };
 
@@ -151,7 +164,11 @@ exports.deleteAdmin = async function (req, res) {
 				message: "invalid credentials",
 			};
 		}
+	} catch (error) {
+		return res.status(error.status || 401).send(error.message);
+	}
 
+	try {
 		await UserData.deleteUser(user._id);
 		return res.status(200).send(`deleted ${userId}`);
 	} catch (error) {
