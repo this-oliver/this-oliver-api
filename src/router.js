@@ -30,7 +30,7 @@ Router.post("/api/auth/register", AuthController.register); // note: only one us
 
 // user
 Router.get("/api/user", UserController.getUser);
-Router.patch("/api/user/views", UserController.incrementView);
+Router.patch("/api/user/visits", UserController.incrementVisits);
 
 // experiences
 /* Token Required */ Router.post("/api/experiences", XpController.postExperience);

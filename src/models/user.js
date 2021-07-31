@@ -17,7 +17,7 @@ const user = new Schema(
 		},
 		experiences: [{ type: Schema.Types.ObjectId, ref: "experience" }],
 		articles: [{ type: Schema.Types.ObjectId, ref: "article" }],
-		views: { type: Number, default: 0 },
+		visits: { type: Number, default: 0 },
 		salt: { type: String },
 	},
 	{ timestamps: true }

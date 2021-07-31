@@ -101,7 +101,7 @@ exports.updateUser = async (id, patch) => {
 	}
 };
 
-exports.incrementUserViews = async (id) => {
+exports.incrementUserVisits = async (id) => {
 	try {
 		let user = await this.getSingleUser(id);
 
@@ -111,7 +111,7 @@ exports.incrementUserViews = async (id) => {
 				message: `user ${id} does not exist`, 
 			};
 
-		user.views = user.views + 1;
+		user.visits = user.visits + 1;
 		
 		user = await user.save();
 		return user;
