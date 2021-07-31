@@ -30,7 +30,6 @@ Router.post("/api/auth/register", AuthController.register); // note: only one us
 
 // user
 Router.get("/api/user", UserController.getUser);
-Router.get("/api/user/articles", UserController.getUserArticles);
 
 // experiences
 /* Token Required */ Router.post("/api/experiences", XpController.postExperience);
@@ -44,5 +43,10 @@ Router.get("/api/articles/:id", ArticleController.getSingleArticle);
 /* Token Required */ Router.patch("/api/articles/:id", ArticleController.patchArticle);
 /* Token Required */ Router.delete("/api/articles/:id", ArticleController.deleteArticle);
 
-module.exports = Router;
 
+// wildcard
+Router.get("/*", (req, res) => {
+	return res.status(400).send(`[*] the resource '${req.url}' does not exists`);
+});
+
+module.exports = Router;
