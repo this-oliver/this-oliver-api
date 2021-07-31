@@ -10,7 +10,7 @@ exports.getAdmin = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		const user = await UserData.getAdmin();
+		const user = await UserData.getUser(true);
 
 		if (!user) {
 			throw {

@@ -13,11 +13,12 @@ const user = new Schema(
 		password: { type: String, required: true },
 		bio: {
 			short: { type: String, default: "" },
-			long: { type: String, default: "" }, 
+			long: { type: String, default: "" },
 		},
 		experiences: [{ type: Schema.Types.ObjectId, ref: "experience" }],
 		articles: [{ type: Schema.Types.ObjectId, ref: "article" }],
-		salt: { type: String }, 
+		views: { type: Number, default: 0 },
+		salt: { type: String },
 	},
 	{ timestamps: true }
 );
@@ -45,9 +46,9 @@ user.methods.verifyPassword = async function (candidate) {
 	const thisUser = this;
 	try {
 		const isMatch = await bcrypt.compare(candidate, thisUser.password);
-		return Promise.resolve(isMatch);
+		return isMatch;
 	} catch (error) {
-		throw Promise.reject({ status: 500, message: error });
+		throw { status: 500, message: error };
 	}
 };
 

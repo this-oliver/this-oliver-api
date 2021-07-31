@@ -363,6 +363,158 @@ describe("Articles in MiddleWare", function () {
 			Expect(resArticle.publish).to.equal(factoryArticle2.publish);
 		});
 
+		it("incrementing an article's views should return article with views + 1 and 200 ", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const factoryArticle1 = Factory.models.createArticle(
+				user._id,
+				false,
+				"article1"
+			);
+
+			const article1 = await ArticleData.postArticle(
+				factoryArticle1.author,
+				factoryArticle1.title,
+				factoryArticle1.content,
+				[],
+				factoryArticle1.publish
+			);
+
+			const response = await Request.patch(`/api/articles/${article1.id}/views`).expect(200);
+			Expect(response.body.views).to.equal(1);
+
+			const response2 = await Request.patch(`/api/articles/${article1.id}/views`).expect(200);
+			Expect(response2.body.views).to.equal(2);
+		});
+
+		it("incrementing an article's likes should return article with likes + 1 and 200 ", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const factoryArticle1 = Factory.models.createArticle(
+				user._id,
+				false,
+				"article1"
+			);
+
+			const article1 = await ArticleData.postArticle(
+				factoryArticle1.author,
+				factoryArticle1.title,
+				factoryArticle1.content,
+				[],
+				factoryArticle1.publish
+			);
+
+			const response = await Request.patch(
+				`/api/articles/${article1.id}/likes`
+			).expect(200);
+			Expect(response.body.likes).to.equal(1);
+
+			const response2 = await Request.patch(
+				`/api/articles/${article1.id}/likes`
+			).expect(200);
+			Expect(response2.body.likes).to.equal(2);
+		});
+
+		it("incrementing an article's dislikes should return article with dislikes + 1 and 200 ", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const factoryArticle1 = Factory.models.createArticle(
+				user._id,
+				false,
+				"article1"
+			);
+
+			const article1 = await ArticleData.postArticle(
+				factoryArticle1.author,
+				factoryArticle1.title,
+				factoryArticle1.content,
+				[],
+				factoryArticle1.publish
+			);
+
+			const response = await Request.patch(
+				`/api/articles/${article1.id}/dislikes`
+			).expect(200);
+			Expect(response.body.dislikes).to.equal(1);
+
+			const response2 = await Request.patch(
+				`/api/articles/${article1.id}/dislikes`
+			).expect(200);
+			Expect(response2.body.dislikes).to.equal(2);
+		});
+
+		it("decrementing an article's likes should not fall below zero. Response should return article with likes >= 0 and 200 ", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const factoryArticle1 = Factory.models.createArticle(
+				user._id,
+				false,
+				"article1"
+			);
+
+			const article1 = await ArticleData.postArticle(
+				factoryArticle1.author,
+				factoryArticle1.title,
+				factoryArticle1.content,
+				[],
+				factoryArticle1.publish
+			);
+
+			// add one likes to the article
+			await ArticleData.incrementArticleLikes(article1._id);
+
+			// 1-1 = 0 = likes
+			let response = await Request.patch(
+				`/api/articles/${article1.id}/likes/revert`
+			).expect(200);
+			Expect(response.body.likes).to.equal(0);
+
+			// 0-1 = 0 = likes
+			response = await Request.patch(
+				`/api/articles/${article1.id}/likes/revert`
+			).expect(200);
+			Expect(response.body.likes).to.equal(0);
+
+		});
+
+		it("decrementing an article's dislikes should not fall below zero. Response should return article with dislikes >= 0 and 200 ", async function () {
+			const factoryUser = Factory.models.createUsers();
+			const user = await UserSchema.create(factoryUser);
+
+			const factoryArticle1 = Factory.models.createArticle(
+				user._id,
+				false,
+				"article1"
+			);
+
+			const article1 = await ArticleData.postArticle(
+				factoryArticle1.author,
+				factoryArticle1.title,
+				factoryArticle1.content,
+				[],
+				factoryArticle1.publish
+			);
+
+			// add one dislikes to the article
+			await ArticleData.incrementArticleDislikes(article1._id);
+
+			// 1-1 = 0 = dislikes
+			let response = await Request.patch(
+				`/api/articles/${article1.id}/dislikes/revert`
+			).expect(200);
+			Expect(response.body.dislikes).to.equal(0);
+
+			// 0-1 = 0 = dislikes
+			response = await Request.patch(
+				`/api/articles/${article1.id}/dislikes/revert`
+			).expect(200);
+			Expect(response.body.dislikes).to.equal(0);
+		});
+
 		it("patching article with valid id and invalid token should 401 ", async function () {
 			const factoryUser = Factory.models.createUsers();
 			const user = await UserSchema.create(factoryUser);

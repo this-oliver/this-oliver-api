@@ -68,6 +68,72 @@ exports.patchArticle = async function (req, res) {
 	}
 };
 
+exports.incrementArticleViews = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleViews(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleShares = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleShares(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleLikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleLikes(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.incrementArticleDislikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.incrementArticleDislikes(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.decrementArticleLikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.decrementArticleLikes(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.decrementArticleDislikes = async function (req, res) {
+	const articleId = req.params.id;
+	
+	try {
+		const article = await ArticleData.decrementArticleDislikes(articleId);
+		return res.status(200).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
 exports.deleteArticle = async function (req, res) {
 	const articleId = req.params.id;
 

@@ -30,6 +30,7 @@ Router.post("/api/auth/register", AuthController.register); // note: only one us
 
 // user
 Router.get("/api/user", UserController.getUser);
+Router.patch("/api/user/views", UserController.incrementView);
 
 // experiences
 /* Token Required */ Router.post("/api/experiences", XpController.postExperience);
@@ -39,6 +40,12 @@ Router.get("/api/user", UserController.getUser);
 // articles
 Router.get("/api/articles", ArticleController.getAllArticles);
 Router.get("/api/articles/:id", ArticleController.getSingleArticle);
+Router.patch("/api/articles/:id/views", ArticleController.incrementArticleViews);
+Router.patch("/api/articles/:id/shares", ArticleController.incrementArticleShares);
+Router.patch("/api/articles/:id/likes", ArticleController.incrementArticleLikes);
+Router.patch("/api/articles/:id/dislikes", ArticleController.incrementArticleDislikes);
+Router.patch("/api/articles/:id/likes/revert", ArticleController.decrementArticleLikes);
+Router.patch("/api/articles/:id/dislikes/revert", ArticleController.decrementArticleDislikes);
 /* Token Required */ Router.post("/api/articles", ArticleController.postArticle);
 /* Token Required */ Router.patch("/api/articles/:id", ArticleController.patchArticle);
 /* Token Required */ Router.delete("/api/articles/:id", ArticleController.deleteArticle);

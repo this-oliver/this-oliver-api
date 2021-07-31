@@ -18,6 +18,16 @@ exports.getUser = async function (req, res) {
 	}
 };
 
+exports.incrementView = async function (req, res) {
+	try {
+		const user = await UserData.getUser();
+		const updateUser = await UserData.incrementUserViews(user._id);
+		return res.status(200).send(updateUser);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
 exports.getUserArticles = async function (req, res) {
 
 	try {

@@ -16,34 +16,27 @@ exports.getAllUsers = async () => {
 	}
 };
 
-exports.getUser = async () => {
+exports.getUser = async (showSecrets = false) => {
 	try {
-		const user = await User.findOne()
-			.select("-password -salt")
-			.populate("experiences")
-			.populate({
-				path: "articles",
-				match: { publish: true },
-			})
-			.exec();
+		let user;
 
-		return user;
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message || error,
-		};
-	}
-};
+		if(showSecrets){
+			user = await User.findOne()
+				.select("-password -salt")
+				.populate("experiences")
+				.populate("articles")
+				.exec();
 
-exports.getAdmin = async () => {
-	try {
-		const user = await User.findOne()
-			.select("-password -salt")
-			.populate("experiences")
-			.populate("articles")
-			.exec();
-
+		}else {
+			user = await User.findOne()
+				.select("-password -salt")
+				.populate("experiences")
+				.populate({
+					path: "articles",
+					match: { publish: true },
+				})
+				.exec();
+		}
 		return user;
 	} catch (error) {
 		throw {
@@ -98,6 +91,28 @@ exports.updateUser = async (id, patch) => {
 			user.bio.long = patch.bio.long || user.bio.long;
 		}
 
+		user = await user.save();
+		return user;
+	} catch (error) {
+		throw {
+			status: error.status || 400,
+			message: error.message || error, 
+		};
+	}
+};
+
+exports.incrementUserViews = async (id) => {
+	try {
+		let user = await this.getSingleUser(id);
+
+		if (user == null)
+			throw {
+				status: 404,
+				message: `user ${id} does not exist`, 
+			};
+
+		user.views = user.views + 1;
+		
 		user = await user.save();
 		return user;
 	} catch (error) {
