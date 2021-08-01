@@ -21,6 +21,7 @@ describe("User in Data", function () {
 	});
 
 	after(async function () {
+		await Database.drop();
 		await Database.disconnect();
 	});
 

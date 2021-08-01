@@ -22,7 +22,7 @@ describe("Admin in MiddleWare", function () {
 	});
 
 	after(async function () {
-		await UserSchema.deleteMany({});
+		await Database.drop();
 		await Database.disconnect();
 	});
 

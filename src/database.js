@@ -1,13 +1,28 @@
 require("dotenv").config();
-const db = require("mongoose");
+const Database = require("mongoose");
 
-const connect = async () => {
-	const MongoUri = process.env.NODE_ENV === "test"
+process.env.MONGODB =
+	process.env.NODE_ENV === "test"
 		? process.env.DB_URI_TEST
 		: process.env.DB_URI;
 
-	return await db.connect(
-		MongoUri,
+console.log({
+	env: process.env.NODE_ENV,
+	mongo: process.env.MONGODB,
+	uri: process.env.DB_URI,
+	testUri: process.env.DB_URI_TEST,
+});
+
+
+exports.connection = Database.connection;
+
+exports.drop = async () => {
+	return Database.connection.dropDatabase();
+};
+
+exports.connect = async () => {
+	return await Database.connect(
+		process.env.MONGODB,
 		{
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
@@ -15,7 +30,7 @@ const connect = async () => {
 		function (err) {
 			if (err) {
 				console.error(
-					`Failed to connect to MongoDB with URI '${MongoUri}' and NODE_ENV '${process.env.NODE_ENV}'`
+					`Failed to connect to MongoDB with URI '${process.env.MONGODB}' and NODE_ENV '${process.env.NODE_ENV}'`
 				);
 				console.error(err.stack);
 				process.exit(1);
@@ -24,12 +39,6 @@ const connect = async () => {
 	);
 };
 
-const connection = () => {
-	return db.connection;
+exports.disconnect = async () => {
+	return await Database.disconnect();
 };
-
-const disconnect = async () => {
-	return await db.disconnect();
-};
-
-module.exports = { connect, connection, disconnect };
