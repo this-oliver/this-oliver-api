@@ -19,6 +19,7 @@ describe("Authentication in Middleware", function () {
 
 	// disconnect the db after testing everything
 	after(async function () {
+		await Database.drop();
 		await Database.disconnect();
 	});
 

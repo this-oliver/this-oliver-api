@@ -22,6 +22,7 @@ describe("Articles in MiddleWare", function () {
 	});
 
 	after(async function () {
+		await Database.drop();
 		await Database.disconnect();
 	});
 

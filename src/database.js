@@ -1,10 +1,16 @@
 require("dotenv").config();
-const db = require("mongoose");
+const Database = require("mongoose");
 
-process.env.MONGODB =	process.env.NODE_ENV === "test"		? process.env.DB_URI_TEST		: process.env.DB_URI;
+process.env.MONGODB = process.env.DB_URI;
 
-const connect = async () => {
-	return await db.connect(
+exports.connection = Database.connection;
+
+exports.drop = async () => {
+	return Database.connection.dropDatabase();
+};
+
+exports.connect = async () => {
+	return await Database.connect(
 		process.env.MONGODB,
 		{
 			useNewUrlParser: true,
@@ -13,7 +19,7 @@ const connect = async () => {
 		function (err) {
 			if (err) {
 				console.error(
-					`Failed to connect to MongoDB with URI: ${process.env.MONGODB}`
+					`Failed to connect to MongoDB with URI '${process.env.MONGODB}' and NODE_ENV '${process.env.NODE_ENV}'`
 				);
 				console.error(err.stack);
 				process.exit(1);
@@ -22,12 +28,6 @@ const connect = async () => {
 	);
 };
 
-const connection = () => {
-	return db.connection;
+exports.disconnect = async () => {
+	return await Database.disconnect();
 };
-
-const disconnect = async () => {
-	return await db.disconnect();
-};
-
-module.exports = { connect, connection, disconnect };
