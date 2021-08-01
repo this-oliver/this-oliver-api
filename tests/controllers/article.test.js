@@ -17,9 +17,15 @@ const Factory = require("../factory");
 const TokenHelper = require("../../src/helpers/token");
 
 describe("Articles in MiddleWare", function () {
+	let testUser, requestToken;
+
 	before(async function () {
 		await Database.connect();
 		await Database.drop();
+
+		const factoryUser = Factory.models.createUsers();
+		testUser = await UserSchema.create(factoryUser);
+		requestToken = TokenHelper.getToken(testUser._id);
 	});
 	
 	after(async function () {
@@ -29,16 +35,11 @@ describe("Articles in MiddleWare", function () {
 
 	describe("[POST]", function () {
 		beforeEach(async function () {
-			await UserSchema.deleteMany({});
 			await ArticleSchema.deleteMany({});
 		});
 
 		it("post article with valid token should return article and 201 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-
-			const requestArticle = Factory.models.createArticle(user._id);
-			const requestToken = TokenHelper.getToken(user._id);
+			const requestArticle = Factory.models.createArticle(testUser._id);
 
 			const response = await Request.post("/api/articles")
 				.set("Authorization", `bearer ${requestToken}`)
@@ -50,14 +51,9 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("post article with invalid article should return 400 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-
-			const requestArticle = Factory.models.createArticle(user._id);
+			const requestArticle = Factory.models.createArticle(testUser._id);
 			requestArticle.title = null;
 			requestArticle.author = null;
-
-			const requestToken = TokenHelper.getToken(user._id);
 
 			await Request.post("/api/articles")
 				.set("Authorization", `bearer ${requestToken}`)
@@ -66,28 +62,21 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("post article with invalid token should return 401 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-
-			const requestArticle = Factory.models.createArticle(user._id);
-			const requestToken = "invalid_token";
+			const invalidRequestToken = "invalid_token";
+			const requestArticle = Factory.models.createArticle(testUser._id);
 
 			await Request.post("/api/articles")
-				.set("Authorization", `bearer ${requestToken}`)
+				.set("Authorization", `bearer ${invalidRequestToken}`)
 				.send(requestArticle)
 				.expect(401);
 		});
 	});
 
 	describe("[GET]", function () {
-		let testUser, requestToken, privateArticle1, privateArticle2, publicArticle3;
+		let privateArticle1, privateArticle2, publicArticle3;
 		
 		before(async function () {
-			await Database.drop();
-
-			const factoryUser = Factory.models.createUsers();
-			testUser = await UserSchema.create(factoryUser);
-			requestToken = TokenHelper.getToken(testUser._id);
+			await ArticleSchema.deleteMany();
 
 			const factoryPrivateArticle1 = Factory.models.createArticle(
 				testUser._id,
@@ -133,7 +122,6 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		after(async function () {
-			await UserSchema.deleteMany({});
 			await ArticleSchema.deleteMany({});
 		});
 
@@ -232,17 +220,12 @@ describe("Articles in MiddleWare", function () {
 
 	describe("[PATCH]", function () {
 		beforeEach(async function () {
-			await UserSchema.deleteMany({});
 			await ArticleSchema.deleteMany({});
 		});
 
 		it("patching article with valid fields and valid token should return new article and 200 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-			const requestToken = TokenHelper.getToken(user._id);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -256,7 +239,7 @@ describe("Articles in MiddleWare", function () {
 			);
 
 			const factoryArticle2 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				true,
 				"article2"
 			);
@@ -272,11 +255,8 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("incrementing an article's views should return article with views + 1 and 200 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -301,7 +281,7 @@ describe("Articles in MiddleWare", function () {
 			const user = await UserSchema.create(factoryUser);
 
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -326,11 +306,8 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("incrementing an article's dislikes should return article with dislikes + 1 and 200 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -355,12 +332,10 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("patching article with valid id and invalid token should 401 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
 			const invalidRequestToken = "invalid_request_token";
 
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -374,7 +349,7 @@ describe("Articles in MiddleWare", function () {
 			);
 
 			const factoryArticle2 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article2"
 			);
@@ -386,12 +361,8 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("patching article with invalid fields and valid token should 400 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-			const requestToken = TokenHelper.getToken(user._id);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -405,7 +376,7 @@ describe("Articles in MiddleWare", function () {
 			);
 
 			const factoryArticle2 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				2,
 				null
 			);
@@ -420,12 +391,8 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("patching article with invalid id and valid token should return 404 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-			const requestToken = TokenHelper.getToken(user._id);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -441,7 +408,7 @@ describe("Articles in MiddleWare", function () {
 			const invalidArticleId = "invalid_article_id";
 
 			const factoryArticle2 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article2"
 			);
@@ -455,17 +422,12 @@ describe("Articles in MiddleWare", function () {
 
 	describe("[DELETE]", function () {
 		beforeEach(async function () {
-			await UserSchema.deleteMany({});
 			await ArticleSchema.deleteMany({});
 		});
 
 		it("deleting article with valid id and valid token should return 203 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-			const requestToken = TokenHelper.getToken(user._id);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -484,12 +446,8 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("deleting article with invalid id and valid token should return 404 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
-			const requestToken = TokenHelper.getToken(user._id);
-
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
@@ -510,12 +468,10 @@ describe("Articles in MiddleWare", function () {
 		});
 
 		it("deleting article with invalid id and invalid token should return 401 ", async function () {
-			const factoryUser = Factory.models.createUsers();
-			const user = await UserSchema.create(factoryUser);
 			const invalidRequestToken = "invalid_request_token";
 
 			const factoryArticle1 = Factory.models.createArticle(
-				user._id,
+				testUser._id,
 				false,
 				"article1"
 			);
