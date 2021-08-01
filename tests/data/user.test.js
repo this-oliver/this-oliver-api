@@ -15,7 +15,7 @@ const Auth = require("../../src/data/auth");
 // helpers
 const Factory = require("../factory");
 
-describe("User in Models", function () {
+describe("User in Data", function () {
 	before(async function () {
 		await Database.connect();
 	});

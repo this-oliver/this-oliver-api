@@ -1,11 +1,13 @@
 require("dotenv").config();
 const db = require("mongoose");
 
-process.env.MONGODB =	process.env.NODE_ENV === "test"		? process.env.DB_URI_TEST		: process.env.DB_URI;
-
 const connect = async () => {
+	const MongoUri = process.env.NODE_ENV === "test"
+		? process.env.DB_URI_TEST
+		: process.env.DB_URI;
+
 	return await db.connect(
-		process.env.MONGODB,
+		MongoUri,
 		{
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
@@ -13,7 +15,7 @@ const connect = async () => {
 		function (err) {
 			if (err) {
 				console.error(
-					`Failed to connect to MongoDB with URI: ${process.env.MONGODB}`
+					`Failed to connect to MongoDB with URI '${MongoUri}' and NODE_ENV '${process.env.NODE_ENV}'`
 				);
 				console.error(err.stack);
 				process.exit(1);
