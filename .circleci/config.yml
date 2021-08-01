@@ -31,9 +31,6 @@ jobs: # a collection of steps
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      - run:
-          name: "Setup custom environment variables"
-          command: echo 'export JWT_SECRET="TEST_SECRET"' >> $BASH_ENV && echo 'export DB_URI_TEST="mongodb+srv://admin-oliver-test:PqNXZhu9VbyaWR5@oliver-test.dlefo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"' >> $BASH_ENV
       - run: # run tests
           name: test
           command: npm test
