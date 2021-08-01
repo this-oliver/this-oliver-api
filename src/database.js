@@ -1,18 +1,7 @@
 require("dotenv").config();
 const Database = require("mongoose");
 
-process.env.MONGODB =
-	process.env.NODE_ENV === "test"
-		? process.env.DB_URI_TEST
-		: process.env.DB_URI;
-
-console.log({
-	env: process.env.NODE_ENV,
-	mongo: process.env.MONGODB,
-	uri: process.env.DB_URI,
-	testUri: process.env.DB_URI_TEST,
-});
-
+process.env.MONGODB = process.env.DB_URI;
 
 exports.connection = Database.connection;
 
