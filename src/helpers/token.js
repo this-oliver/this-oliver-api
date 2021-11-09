@@ -65,11 +65,10 @@ exports.authenticateRequest = async function(req){
 	}
 
 	try {
-		const Admin = await UserData.getOliver();
+		const admin = await UserData.getOliver();
+		if(admin === undefined || admin === null) throw { status: 404, message: "there is no host :(" };
 
-		if(Admin === undefined || Admin === null) throw { status: 404, message: "there is no host :(" };
-
-		return Admin._id == decoded.data;
+		return admin._id == decoded.data;
 	} catch (error) {
 		console.log( { authError: error } );
 		return false;
