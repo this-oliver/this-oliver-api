@@ -171,7 +171,7 @@ exports.indexSecretArticlesTags = async function (req, res) {
 	if(authenticated === false) return res.status(401).send("invalid credentials");
 	
 	try {
-		const articles = await TagData.indexTags();
+		const articles = await TagData.indexTags(true);
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
