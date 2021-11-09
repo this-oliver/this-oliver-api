@@ -53,7 +53,7 @@ exports.getArticles = async function (req, res) {
 	}
 
 	try {
-		const articles = await ArticleData.getUserArticles(user._id, true);
+		const articles = await ArticleData.getAllArticles(true);
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);

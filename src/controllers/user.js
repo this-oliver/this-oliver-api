@@ -1,6 +1,5 @@
 // data
 const UserData = require("../data/user");
-const ArticleData = require("../data/article");
 
 exports.getUser = async function (req, res) {
 
@@ -23,17 +22,6 @@ exports.incrementVisits = async function (req, res) {
 		const user = await UserData.getUser();
 		const updateUser = await UserData.incrementUserVisits(user._id);
 		return res.status(200).send(updateUser);
-	} catch (error) {
-		return res.status(error.status).send(error.message);
-	}
-};
-
-exports.getUserArticles = async function (req, res) {
-
-	try {
-		const user = await UserData.getUser();
-		const articles = await ArticleData.getUserArticles(user._id);
-		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}

@@ -145,52 +145,6 @@ exports.getSingleArticle = async (id, showSecrets = false) => {
 	}
 };
 
-exports.getUserArticles = async (id, showSecrets = false) => {
-	if (!id) {
-		throw {
-			status: 400,
-			message: "missing id", 
-		};
-	}
-
-	try {
-		let articles;
-
-		if(showSecrets){
-			articles = await ArticleSchema.find({ author: id })
-				.populate("tags")
-				.populate({
-					path: "author",
-					select: {
-						_id: 1,
-						name: 1,
-						email: 1,
-					},
-				})
-				.exec();
-		}else {
-			articles = await ArticleSchema.find({ author: id, publish: true })
-				.populate("tags")
-				.populate({
-					path: "author",
-					select: {
-						_id: 1,
-						name: 1,
-						email: 1,
-					},
-				})
-				.exec();
-		}
-
-		return articles;
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message || error, 
-		};
-	}
-};
-
 exports.updateArticle = async (id, patch) => {
 	let article = null;
 
