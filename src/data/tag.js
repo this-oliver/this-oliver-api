@@ -1,4 +1,3 @@
-// mongo
 const TagSchema = require("../models/tag");
 
 exports.createTag = async (name) => {
@@ -13,9 +12,28 @@ exports.createTag = async (name) => {
 	}
 };
 
-exports.indexTags = async () => {
+exports.indexTags = async (showSecrets = false) => {
 	try {
-		return await TagSchema.find().exec();
+		if(showSecrets){
+			return await TagSchema.find().exec();
+		}
+
+		else {
+			const tags = await TagSchema.aggregate([
+				{
+					$lookup: {
+						"from": "articles",
+						"localField": "_id",
+						"foreignField": "tags",
+						"as": "articles"
+					}
+				},
+				{ $match: { "articles.0": { $exists: true }, "articles.publish": true } },
+				{ $project: { articles: false } }
+			]).exec();
+
+			return tags;
+		}
 	} catch (error) {
 		throw {
 			status: 400,
