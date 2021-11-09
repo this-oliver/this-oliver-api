@@ -21,9 +21,9 @@ exports.postExperience = async function (req, res) {
 	}
 };
 
-exports.getAllExperiences = function (req, res) {
+exports.indexExperiences = function (req, res) {
 	try {
-		const xp = ExperienceData.getAllExperiences();
+		const xp = ExperienceData.indexExperiences();
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);

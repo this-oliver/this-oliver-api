@@ -1,7 +1,7 @@
 // mongo
 const User = require("../models/user");
 
-exports.getAllUsers = async () => {
+exports.indexUsers = async () => {
 	try {
 		const users = await User.find()
 			.select("-password -salt")

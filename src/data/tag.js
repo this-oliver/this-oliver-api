@@ -20,7 +20,7 @@ exports.cleanTags = async (dirtyList) => {
 
 	try {
 		const cleanList = []; // list of tags
-		const allTags = await this.getAllTags();
+		const allTags = await this.indexTags();
 
 		for (let x = 0; x < dirtyList.length; x++) {
 			const dirtyTag = dirtyList[x];
@@ -50,7 +50,7 @@ exports.cleanTags = async (dirtyList) => {
 	}
 };
 
-exports.getAllTags = async () => {
+exports.indexTags = async () => {
 	try {
 		return await TagSchema.find().exec();
 	} catch (error) {

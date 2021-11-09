@@ -42,7 +42,7 @@ exports.postExperience = async (userId,
 	}
 };
 
-exports.getAllExperiences = async () => {
+exports.indexExperiences = async () => {
 	try {
 		return await ExperienceSchema.find().exec();
 	} catch (error) {

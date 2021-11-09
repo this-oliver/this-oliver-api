@@ -49,7 +49,7 @@ exports.login = async (email, password) => {
 
 exports.register = async (name, email, password) => {
 	try {
-		const users = await UserData.getAllUsers();
+		const users = await UserData.indexUsers();
 
 		if (users.length > 0) {
 			throw {

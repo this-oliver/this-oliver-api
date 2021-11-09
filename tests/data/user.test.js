@@ -60,16 +60,16 @@ describe("User in Data", function () {
 			await UserSchema.deleteMany({});
 		});
 
-		it("getAllUsers return empty list", async function () {
-			const users = await User.getAllUsers();
+		it("indexUsers return empty list", async function () {
+			const users = await User.indexUsers();
 			Expect(users.length).to.equal(0);
 		});
 
-		it("getAllUsers should return all five users", async function () {
+		it("indexUsers should return all five users", async function () {
 			const factoryUsers = Factory.models.createUsers(5);
 			await UserSchema.create(factoryUsers);
 
-			const users = await User.getAllUsers();
+			const users = await User.indexUsers();
 			Expect(users.length).to.equal(5);
 		});
 

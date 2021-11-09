@@ -23,7 +23,7 @@ exports.postArticle = async function (req, res) {
 
 exports.indexArticles = async function (req, res) {
 	try {
-		const articles = await ArticleData.getAllArticles();
+		const articles = await ArticleData.indexArticles();
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -51,7 +51,7 @@ exports.indexSecretArticles = async function (req, res) {
 	}
 
 	try {
-		const articles = await ArticleData.getAllArticles(true);
+		const articles = await ArticleData.indexArticles(true);
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);

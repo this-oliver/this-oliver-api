@@ -50,7 +50,7 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 	}
 };
 
-exports.getAllArticles = async (showSecrets = false) => {
+exports.indexArticles = async (showSecrets = false) => {
 	try {
 		const articles = showSecrets ?			await ArticleSchema.find()
 			.populate("tags")
