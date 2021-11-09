@@ -61,7 +61,7 @@ exports.indexTags = async () => {
 	}
 };
 
-exports.getSingleTag = async (id) => {
+exports.getTag = async (id) => {
 	if (!id) {
 		throw {
 			status: 400,
@@ -82,7 +82,7 @@ exports.getSingleTag = async (id) => {
 
 exports.deleteTag = async (id) => {
 	try {
-		let tag = await this.getSingleTag(id);
+		let tag = await this.getTag(id);
 		tag = await tag.remove();
 
 		return `${tag.title} with id ${id} deleted`;

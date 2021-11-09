@@ -75,15 +75,15 @@ describe("User in Data", function () {
 
 		it("get user with invalid _id should throw expected error", async function () {
 			const invalidId = Factory.mongo.createObjectId();
-			const getUser = User.getSingleUser(invalidId);
-			await Expect(getUser).to.be.empty;
+			const user = User.getUser(invalidId);
+			await Expect(user).to.be.empty;
 		});
 
 		it("gets user with valid _id should return user", async function () {
 			const factoryUser = Factory.models.createUsers();
 
 			const createdUser = await UserSchema.create(factoryUser);
-			const user = await User.getSingleUser(createdUser._id);
+			const user = await User.getUser(createdUser._id);
 			Expect(user.name).to.equal(createdUser.name);
 			Expect(user.email).to.equal(createdUser.email);
 		});

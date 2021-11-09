@@ -30,11 +30,11 @@ exports.indexExperiences = function (req, res) {
 	}
 };
 
-exports.getSingleExperience = function (req, res) {
+exports.getExperience = function (req, res) {
 	const xpId = req.params.id;
 
 	try {
-		const xp = ExperienceData.getSingleExperience(xpId);
+		const xp = ExperienceData.getExperience(xpId);
 		return res.status(200).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -48,7 +48,7 @@ exports.patchExperience = async function (req, res) {
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		const xp = await ExperienceData.getSingleExperience(xpId);
+		const xp = await ExperienceData.getExperience(xpId);
 
 		if (xp.author != decoded.data) {
 			throw {
@@ -74,7 +74,7 @@ exports.deleteExperience = async function (req, res) {
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		const xp = await ExperienceData.getSingleExperience(xpId);
+		const xp = await ExperienceData.getExperience(xpId);
 
 		if (xp.author != decoded.data) {
 			throw {

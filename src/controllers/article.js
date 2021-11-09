@@ -38,7 +38,7 @@ exports.indexSecretArticles = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		user = await UserData.getUser();
+		user = await UserData.getOliver();
 
 		if (user._id != decoded.data) {
 			throw {
@@ -62,7 +62,7 @@ exports.getArticle = async function (req, res) {
 	const articleId = req.params.id;
 
 	try {
-		const article = await ArticleData.getSingleArticle(articleId);
+		const article = await ArticleData.getArticle(articleId);
 		return res.status(200).send(article);
 		
 	} catch (error) {
@@ -78,7 +78,7 @@ exports.getSecretArticle = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		const article = await ArticleData.getSingleArticle(articleId, true);
+		const article = await ArticleData.getArticle(articleId, true);
 		if (article.author._id != decoded.data) {
 			throw {
 				status: 401,
@@ -90,7 +90,7 @@ exports.getSecretArticle = async function (req, res) {
 	}
 
 	try {
-		const article = await ArticleData.getSingleArticle(articleId, true);
+		const article = await ArticleData.getArticle(articleId, true);
 		return res.status(200).send(article);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -104,7 +104,7 @@ exports.patchArticle = async function (req, res) {
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		const article = await ArticleData.getSingleArticle(articleId, true);
+		const article = await ArticleData.getArticle(articleId, true);
 		if (article.author._id != decoded.data) {
 			throw {
 				status: 401,
@@ -162,7 +162,7 @@ exports.deleteArticle = async function (req, res) {
 	try {
 		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
 
-		const article = await ArticleData.getSingleArticle(articleId, true);
+		const article = await ArticleData.getArticle(articleId, true);
 
 		if (article.author._id != decoded.data) {
 			throw {

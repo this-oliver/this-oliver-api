@@ -28,7 +28,7 @@ Router.post("/api/auth/register", AuthController.register); // note: only one us
 /* Token Required */ Router.patch("/api/admin", UserController.patch);
 
 // user
-Router.get("/api/user", UserController.getUser);
+Router.get("/api/user", UserController.getOliver);
 Router.patch("/api/user/visits", UserController.incrementVisits);
 
 // experiences

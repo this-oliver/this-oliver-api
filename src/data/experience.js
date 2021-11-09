@@ -12,7 +12,7 @@ exports.postExperience = async (userId,
 	let user = null;
 
 	try {
-		user = await UserData.getSingleUser(userId);
+		user = await UserData.getUser(userId);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -53,7 +53,7 @@ exports.indexExperiences = async () => {
 	}
 };
 
-exports.getSingleExperience = async (id) => {
+exports.getExperience = async (id) => {
 	if (!id) {
 		throw {
 			status: 400,
@@ -84,7 +84,7 @@ exports.updateExperience = async (id, patch) => {
 	let xp = null;
 
 	try {
-		xp = await this.getSingleExperience(id);
+		xp = await this.getExperience(id);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -112,7 +112,7 @@ exports.updateExperience = async (id, patch) => {
 
 exports.deleteExperience = async (id) => {
 	try {
-		let xp = await this.getSingleExperience(id);
+		let xp = await this.getExperience(id);
 		xp = await xp.remove();
 
 		return `${xp.title} with id ${id} deleted`;

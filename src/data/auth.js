@@ -37,7 +37,7 @@ exports.login = async (email, password) => {
 	}
 
 	try {
-		user = await UserData.getSingleUser(user._id);
+		user = await UserData.getUser(user._id);
 		return user;
 	} catch (error) {
 		throw {
@@ -73,7 +73,7 @@ exports.register = async (name, email, password) => {
 			})
 		);
 
-		const result = UserData.getSingleUser(user._id);
+		const result = UserData.getUser(user._id);
 		return Promise.resolve(result);
 	} catch (error) {
 		throw {

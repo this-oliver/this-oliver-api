@@ -8,7 +8,7 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 
 	// get user
 	try {
-		user = await UserData.getSingleUser(userId);
+		user = await UserData.getUser(userId);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -83,7 +83,7 @@ exports.indexArticles = async (showSecrets = false) => {
 	}
 };
 
-exports.getSingleArticle = async (id, showSecrets = false) => {
+exports.getArticle = async (id, showSecrets = false) => {
 	if (!id) {
 		throw {
 			status: 400,
@@ -149,7 +149,7 @@ exports.updateArticle = async (id, patch) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -182,7 +182,7 @@ exports.incrementArticleViews = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -209,7 +209,7 @@ exports.incrementArticleLikes = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -236,7 +236,7 @@ exports.incrementArticleDislikes = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -261,7 +261,7 @@ exports.incrementArticleDislikes = async (id) => {
 
 exports.deleteArticle = async (id) => {
 	try {
-		let xp = await this.getSingleArticle(id, true);
+		let xp = await this.getArticle(id, true);
 		xp = await xp.remove();
 
 		return `${xp.title} with id ${id} deleted`;

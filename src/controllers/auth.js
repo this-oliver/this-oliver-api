@@ -42,7 +42,7 @@ exports.resetPassword = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		user = await UserData.getSingleUser(decoded.data);
+		user = await UserData.getUser(decoded.data);
 
 		if (user._id != decoded.data) {
 			throw {

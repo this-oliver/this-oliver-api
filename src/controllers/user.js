@@ -2,10 +2,10 @@
 const UserData = require("../data/user");
 const TokenHelper = require("../helpers/token");
 
-exports.getUser = async function (req, res) {
+exports.getOliver = async function (req, res) {
 
 	try {
-		const user = await UserData.getUser();
+		const user = await UserData.getOliver();
 		
 		if (!user) {
 			return res.status(404).send("user not found");
@@ -24,7 +24,7 @@ exports.getAdmin = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		const user = await UserData.getUser(true);
+		const user = await UserData.getOliver(true);
 
 		if (!user) {
 			throw {
@@ -55,7 +55,7 @@ exports.patch = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		user = await UserData.getUser();
+		user = await UserData.getOliver();
 
 		if (user._id != decoded.data) {
 			throw {
@@ -77,7 +77,7 @@ exports.patch = async function (req, res) {
 
 exports.incrementVisits = async function (req, res) {
 	try {
-		const user = await UserData.getUser();
+		const user = await UserData.getOliver();
 		const updateUser = await UserData.incrementUserVisits(user._id);
 		return res.status(200).send(updateUser);
 	} catch (error) {
@@ -98,7 +98,7 @@ exports.delete = async function (req, res) {
 			req.headers.authorization.split(" ")[1]
 		);
 
-		user = await UserData.getSingleUser(userId);
+		user = await UserData.getUser(userId);
 
 		if (user._id != decoded.data) {
 			throw {
