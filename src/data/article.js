@@ -52,29 +52,78 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 
 exports.indexArticles = async (showSecrets = false) => {
 	try {
-		const articles = showSecrets ?			await ArticleSchema.find()
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1, 
-				}, 
-			})
-			.exec() :			await ArticleSchema.find({ publish: true })
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1, 
-				}, 
-			})
-			.exec();
+		if(showSecrets){
+			const articles = await ArticleSchema.find()
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
 
-		return articles;
+			return articles;
+		}
+
+		else {
+			const articles = await ArticleSchema.find({ publish: true })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
+	} catch (error) {
+		throw {
+			status: 400,
+			message: error.message || error, 
+		};
+	}
+};
+
+exports.indexArticlesByTag = async (tagId, showSecrets = false) => {
+	
+	try {
+		if(showSecrets){
+			const articles = await ArticleSchema.find({}, { tags: { $elemMatch : { _id: { $eq: tagId } } } })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
+		else {
+			const articles = await ArticleSchema.find({ publish: true }, { tags: { $elemMatch : { _id: { $eq: tagId } } } })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
 	} catch (error) {
 		throw {
 			status: 400,

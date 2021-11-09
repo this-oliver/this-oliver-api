@@ -13,43 +13,6 @@ exports.createTag = async (name) => {
 	}
 };
 
-exports.cleanTags = async (dirtyList) => {
-	if (!dirtyList) {
-		return [];
-	}
-
-	try {
-		const cleanList = []; // list of tags
-		const allTags = await this.indexTags();
-
-		for (let x = 0; x < dirtyList.length; x++) {
-			const dirtyTag = dirtyList[x];
-			let found = false;
-
-			for (let i = 0; i < allTags.length; i++) {
-				const cleanTag = allTags[i];
-				if (dirtyTag.toLowerCase() == cleanTag.name.toLowerCase()) {
-					found = true;
-					cleanList.push(cleanTag._id);
-					break;
-				}
-			}
-
-			if (!found) {
-				const newTag = await this.createTag(dirtyTag);
-				cleanList.push(newTag._id);
-			}
-		}
-
-		return cleanList;
-	} catch (error) {
-		throw {
-			status: error.status || 400,
-			message: error.message, 
-		};
-	}
-};
-
 exports.indexTags = async () => {
 	try {
 		return await TagSchema.find().exec();
@@ -90,6 +53,43 @@ exports.deleteTag = async (id) => {
 		throw {
 			status: error.status || 400,
 			message: error.message || error, 
+		};
+	}
+};
+
+exports.cleanTags = async (dirtyList) => {
+	if (!dirtyList) {
+		return [];
+	}
+
+	try {
+		const cleanList = []; // list of tags
+		const allTags = await this.indexTags();
+
+		for (let x = 0; x < dirtyList.length; x++) {
+			const dirtyTag = dirtyList[x];
+			let found = false;
+
+			for (let i = 0; i < allTags.length; i++) {
+				const cleanTag = allTags[i];
+				if (dirtyTag.toLowerCase() == cleanTag.name.toLowerCase()) {
+					found = true;
+					cleanList.push(cleanTag._id);
+					break;
+				}
+			}
+
+			if (!found) {
+				const newTag = await this.createTag(dirtyTag);
+				cleanList.push(newTag._id);
+			}
+		}
+
+		return cleanList;
+	} catch (error) {
+		throw {
+			status: error.status || 400,
+			message: error.message, 
 		};
 	}
 };

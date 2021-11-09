@@ -25,6 +25,8 @@ Router.post("/api/auth/register", AuthController.register); // note: only one us
 /* Token Required */ Router.get("/api/admin", UserController.getAdmin);
 /* Token Required */ Router.get("/api/admin/articles", ArticleController.indexSecretArticles);
 /* Token Required */ Router.get("/api/admin/articles/:id", ArticleController.getSecretArticle);
+/* Token Required */ Router.get("/api/admin/tags/", ArticleController.indexSecretArticlesTags);
+/* Token Required */ Router.get("/api/admin/tags/:id/articles", ArticleController.indexSecretArticlesByTag);
 /* Token Required */ Router.patch("/api/admin", UserController.patch);
 
 // user
@@ -45,6 +47,10 @@ Router.patch("/api/articles/:id/dislikes", ArticleController.incrementArticleDis
 /* Token Required */ Router.post("/api/articles", ArticleController.postArticle);
 /* Token Required */ Router.patch("/api/articles/:id", ArticleController.patchArticle);
 /* Token Required */ Router.delete("/api/articles/:id", ArticleController.deleteArticle);
+
+// tags
+Router.get("/api/tags/", ArticleController.indexArticlesTags);
+Router.get("/api/tags/:id/articles", ArticleController.indexArticlesByTag);
 
 
 // wildcard
