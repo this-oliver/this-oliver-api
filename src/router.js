@@ -6,8 +6,8 @@ const Router = require("express").Router();
 const AuthController = require("./controllers/auth");
 const AdminController = require("./controllers/admin");
 const UserController = require("./controllers/user");
-const XpController = require("./controllers/xp");
 const ArticleController = require("./controllers/article");
+const ExperienceController = require("./controllers/experience");
 
 Router.get("/", (req, res) => {
 	return res.status(200).send("welcome to olivermanzi's api");
@@ -33,9 +33,9 @@ Router.get("/api/user", UserController.getUser);
 Router.patch("/api/user/visits", UserController.incrementVisits);
 
 // experiences
-/* Token Required */ Router.post("/api/experiences", XpController.postExperience);
-/* Token Required */ Router.patch("/api/experiences/:id", XpController.patchExperience);
-/* Token Required */ Router.delete("/api/experiences/:id", XpController.deleteExperience);
+/* Token Required */ Router.post("/api/experiences", ExperienceController.postExperience);
+/* Token Required */ Router.patch("/api/experiences/:id", ExperienceController.patchExperience);
+/* Token Required */ Router.delete("/api/experiences/:id", ExperienceController.deleteExperience);
 
 // articles
 Router.get("/api/articles", ArticleController.getAllArticles);
