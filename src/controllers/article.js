@@ -1,7 +1,6 @@
 const ArticleData = require("../data/article");
 const TagData = require("../data/tag");
-const UserData = require("../data/user");
-const AuthHelper = require("../helpers/auth");
+
 const TokenHelper = require("../helpers/token");
 
 exports.postArticle = async function (req, res) {
@@ -33,24 +32,8 @@ exports.indexArticles = async function (req, res) {
 };
 
 exports.indexSecretArticles = async function (req, res) {
-	let user = null;
-
-	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
-
-		user = await UserData.getOliver();
-
-		if (user._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
 
 	try {
 		const articles = await ArticleData.indexArticles(true);
@@ -73,23 +56,10 @@ exports.getArticle = async function (req, res) {
 };
 
 exports.getSecretArticle = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
 	const articleId = req.params.id;
-
-	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
-
-		const article = await ArticleData.getArticle(articleId, true);
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
 
 	try {
 		const article = await ArticleData.getArticle(articleId, true);
@@ -100,22 +70,11 @@ exports.getSecretArticle = async function (req, res) {
 };
 
 exports.patchArticle = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
 	const articleId = req.params.id;
 	const patch = req.body;
-
-	try {
-		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
-
-		const article = await ArticleData.getArticle(articleId, true);
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials", 
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
 	
 	try {
 		const article = await ArticleData.updateArticle(articleId, patch);
@@ -159,23 +118,12 @@ exports.incrementArticleDislikes = async function (req, res) {
 };
 
 exports.deleteArticle = async function (req, res) {
+	
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
 	const articleId = req.params.id;
-
-	try {
-		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
-
-		const article = await ArticleData.getArticle(articleId, true);
-
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials", 
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
-
+	
 	try {
 		const article = await ArticleData.deleteArticle(articleId);
 		return res.status(203).send(article);
@@ -197,8 +145,8 @@ exports.indexArticlesByTag = async function (req, res) {
 };
 
 exports.indexSecretArticlesByTag = async function (req, res) {
-	const authenticated = await AuthHelper.authenticateRequest(req);
-	if(authenticated === false) return res.status(401).send();
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
 	
 	try {
 		const tagId = req.params.id;
@@ -219,8 +167,8 @@ exports.indexArticlesTags = async function (req, res) {
 };
 
 exports.indexSecretArticlesTags = async function (req, res) {
-	const authenticated = await AuthHelper.authenticateRequest(req);
-	if(authenticated === false) return res.status(401).send();
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
 	
 	try {
 		const articles = await TagData.indexTags();

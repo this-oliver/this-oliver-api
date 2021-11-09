@@ -19,26 +19,12 @@ exports.getOliver = async function (req, res) {
 };
 
 exports.getAdmin = async function (req, res) {
+	
 	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
+		const authenticated = await TokenHelper.authenticateRequest(req);
+		if(authenticated === false) return res.status(401).send("invalid credentials");
 
 		const user = await UserData.getOliver(true);
-
-		if (!user) {
-			throw {
-				status: 404,
-				message: "user not found",
-			};
-		}
-
-		if (user._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
 
 		return res.status(200).send(user);
 	} catch (error) {
@@ -47,29 +33,14 @@ exports.getAdmin = async function (req, res) {
 };
 
 exports.patch = async function (req, res) {
-	let user = null;
-	const patch = req.body;
-
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
 	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
-
-		user = await UserData.getOliver();
-
-		if (user._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
-
-	try {
-		user = await UserData.updateUser(user._id, patch);
-		return res.status(200).send(user);
+		const patch = req.body;
+		const user = await UserData.getOliver();
+		const updatedUser = await UserData.updateUser(user._id, patch);
+		return res.status(200).send(updatedUser);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
@@ -90,25 +61,11 @@ exports.delete = async function (req, res) {
 	// eslint-disable-next-line no-constant-condition
 	if(true) return;
 
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
 	const userId = req.params.userId;
-	let user = null;
-
-	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
-
-		user = await UserData.getUser(userId);
-
-		if (user._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
+	const user = await UserData.getUser(userId);
 
 	try {
 		await UserData.deleteUser(user._id);

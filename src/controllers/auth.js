@@ -33,29 +33,14 @@ exports.register = async function (req, res) {
 };
 
 exports.resetPassword = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
 	const oldPassword = req.body.oldPassword;
 	const newPassword = req.body.newPassword;
-	let user = null;
 
 	try {
-		const decoded = TokenHelper.verifyToken(
-			req.headers.authorization.split(" ")[1]
-		);
-
-		user = await UserData.getUser(decoded.data);
-
-		if (user._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials",
-			};
-		}
-
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
-
-	try {
+		const user = await UserData.getOliver();
 		await UserData.changePassword(user._id, oldPassword, newPassword);
 		return res.status(200).send({});
 	} catch (error) {
