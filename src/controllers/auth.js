@@ -1,5 +1,6 @@
 // data
 const AuthData = require("../data/auth");
+const UserData = require("../data/user");
 // helpers
 const TokenHelper = require("../helpers/token");
 
@@ -29,4 +30,35 @@ exports.register = async function (req, res) {
 	}
 
 	return res.status(201).send(user);
+};
+
+exports.resetPassword = async function (req, res) {
+	const oldPassword = req.body.oldPassword;
+	const newPassword = req.body.newPassword;
+	let user = null;
+
+	try {
+		const decoded = TokenHelper.verifyToken(
+			req.headers.authorization.split(" ")[1]
+		);
+
+		user = await UserData.getSingleUser(decoded.data);
+
+		if (user._id != decoded.data) {
+			throw {
+				status: 401,
+				message: "invalid credentials",
+			};
+		}
+
+	} catch (error) {
+		return res.status(error.status || 401).send(error.message);
+	}
+
+	try {
+		await UserData.changePassword(user._id, oldPassword, newPassword);
+		return res.status(200).send({});
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
 };
