@@ -8,7 +8,7 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 
 	// get user
 	try {
-		user = await UserData.getSingleUser(userId);
+		user = await UserData.getUser(userId);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -50,31 +50,39 @@ exports.postArticle = async (userId, title, content, tags, publish) => {
 	}
 };
 
-exports.getAllArticles = async (showSecrets = false) => {
+exports.indexArticles = async (showSecrets = false) => {
 	try {
-		const articles = showSecrets ?			await ArticleSchema.find()
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1, 
-				}, 
-			})
-			.exec() :			await ArticleSchema.find({ publish: true })
-			.populate("tags")
-			.populate({
-				path: "author",
-				select: {
-					_id: 1,
-					name: 1,
-					email: 1, 
-				}, 
-			})
-			.exec();
+		if(showSecrets){
+			const articles = await ArticleSchema.find()
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
 
-		return articles;
+			return articles;
+		}
+
+		else {
+			const articles = await ArticleSchema.find({ publish: true })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
 	} catch (error) {
 		throw {
 			status: 400,
@@ -83,7 +91,48 @@ exports.getAllArticles = async (showSecrets = false) => {
 	}
 };
 
-exports.getSingleArticle = async (id, showSecrets = false) => {
+exports.indexArticlesByTag = async (tagId, showSecrets = false) => {
+	
+	try {
+		if(showSecrets){
+			const articles = await ArticleSchema.find({}, { tags: { $elemMatch : { _id: { $eq: tagId } } } })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
+		else {
+			const articles = await ArticleSchema.find({ publish: true }, { tags: { $elemMatch : { _id: { $eq: tagId } } } })
+				.populate("tags")
+				.populate({
+					path: "author",
+					select: {
+						_id: 1,
+						name: 1,
+						email: 1, 
+					}, 
+				})
+				.exec();
+
+			return articles;
+		}
+	} catch (error) {
+		throw {
+			status: 400,
+			message: error.message || error, 
+		};
+	}
+};
+
+exports.getArticle = async (id, showSecrets = false) => {
 	if (!id) {
 		throw {
 			status: 400,
@@ -145,57 +194,11 @@ exports.getSingleArticle = async (id, showSecrets = false) => {
 	}
 };
 
-exports.getUserArticles = async (id, showSecrets = false) => {
-	if (!id) {
-		throw {
-			status: 400,
-			message: "missing id", 
-		};
-	}
-
-	try {
-		let articles;
-
-		if(showSecrets){
-			articles = await ArticleSchema.find({ author: id })
-				.populate("tags")
-				.populate({
-					path: "author",
-					select: {
-						_id: 1,
-						name: 1,
-						email: 1,
-					},
-				})
-				.exec();
-		}else {
-			articles = await ArticleSchema.find({ author: id, publish: true })
-				.populate("tags")
-				.populate({
-					path: "author",
-					select: {
-						_id: 1,
-						name: 1,
-						email: 1,
-					},
-				})
-				.exec();
-		}
-
-		return articles;
-	} catch (error) {
-		throw {
-			status: 400,
-			message: error.message || error, 
-		};
-	}
-};
-
 exports.updateArticle = async (id, patch) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -228,7 +231,7 @@ exports.incrementArticleViews = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -255,7 +258,7 @@ exports.incrementArticleLikes = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -282,7 +285,7 @@ exports.incrementArticleDislikes = async (id) => {
 	let article = null;
 
 	try {
-		article = await this.getSingleArticle(id, true);
+		article = await this.getArticle(id, true);
 	} catch (error) {
 		throw {
 			status: error.status || 400,
@@ -307,7 +310,7 @@ exports.incrementArticleDislikes = async (id) => {
 
 exports.deleteArticle = async (id) => {
 	try {
-		let xp = await this.getSingleArticle(id, true);
+		let xp = await this.getArticle(id, true);
 		xp = await xp.remove();
 
 		return `${xp.title} with id ${id} deleted`;

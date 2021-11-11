@@ -60,30 +60,30 @@ describe("User in Data", function () {
 			await UserSchema.deleteMany({});
 		});
 
-		it("getAllUsers return empty list", async function () {
-			const users = await User.getAllUsers();
+		it("indexUsers return empty list", async function () {
+			const users = await User.indexUsers();
 			Expect(users.length).to.equal(0);
 		});
 
-		it("getAllUsers should return all five users", async function () {
+		it("indexUsers should return all five users", async function () {
 			const factoryUsers = Factory.models.createUsers(5);
 			await UserSchema.create(factoryUsers);
 
-			const users = await User.getAllUsers();
+			const users = await User.indexUsers();
 			Expect(users.length).to.equal(5);
 		});
 
 		it("get user with invalid _id should throw expected error", async function () {
 			const invalidId = Factory.mongo.createObjectId();
-			const getUser = User.getSingleUser(invalidId);
-			await Expect(getUser).to.be.empty;
+			const user = User.getUser(invalidId);
+			await Expect(user).to.be.empty;
 		});
 
 		it("gets user with valid _id should return user", async function () {
 			const factoryUser = Factory.models.createUsers();
 
 			const createdUser = await UserSchema.create(factoryUser);
-			const user = await User.getSingleUser(createdUser._id);
+			const user = await User.getUser(createdUser._id);
 			Expect(user.name).to.equal(createdUser.name);
 			Expect(user.email).to.equal(createdUser.email);
 		});

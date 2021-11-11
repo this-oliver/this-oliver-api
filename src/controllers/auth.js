@@ -1,5 +1,6 @@
 // data
 const AuthData = require("../data/auth");
+const UserData = require("../data/user");
 // helpers
 const TokenHelper = require("../helpers/token");
 
@@ -29,4 +30,20 @@ exports.register = async function (req, res) {
 	}
 
 	return res.status(201).send(user);
+};
+
+exports.resetPassword = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
+	const oldPassword = req.body.oldPassword;
+	const newPassword = req.body.newPassword;
+
+	try {
+		const user = await UserData.getOliver();
+		await UserData.changePassword(user._id, oldPassword, newPassword);
+		return res.status(200).send({});
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
 };

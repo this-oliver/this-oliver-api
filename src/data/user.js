@@ -1,7 +1,7 @@
 // mongo
 const User = require("../models/user");
 
-exports.getAllUsers = async () => {
+exports.indexUsers = async () => {
 	try {
 		const users = await User.find()
 			.select("-password -salt")
@@ -16,7 +16,7 @@ exports.getAllUsers = async () => {
 	}
 };
 
-exports.getUser = async (showSecrets = false) => {
+exports.getOliver = async (showSecrets = false) => {
 	try {
 		let user;
 
@@ -46,7 +46,7 @@ exports.getUser = async (showSecrets = false) => {
 	}
 };
 
-exports.getSingleUser = async (id) => {
+exports.getUser = async (id) => {
 	try {
 		const user = await User.findOne({ _id: id })
 			.select("-password -salt")
@@ -67,7 +67,7 @@ exports.getSingleUser = async (id) => {
 
 exports.updateUser = async (id, patch) => {
 	try {
-		let user = await this.getSingleUser(id);
+		let user = await this.getUser(id);
 
 		if (user == null)
 			throw {
@@ -107,7 +107,7 @@ exports.updateUser = async (id, patch) => {
 
 exports.incrementUserVisits = async (id) => {
 	try {
-		let user = await this.getSingleUser(id);
+		let user = await this.getUser(id);
 
 		if (user == null)
 			throw {
@@ -153,7 +153,7 @@ exports.updateUserPassword = async (userId, oldPwd, newPwd) => {
 
 exports.deleteUser = async (id) => {
 	try {
-		const user = await this.getSingleUser(id);
+		const user = await this.getUser(id);
 
 		if (user == null) {
 			throw {

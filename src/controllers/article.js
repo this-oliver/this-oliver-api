@@ -1,4 +1,5 @@
 const ArticleData = require("../data/article");
+const TagData = require("../data/tag");
 
 const TokenHelper = require("../helpers/token");
 
@@ -21,20 +22,32 @@ exports.postArticle = async function (req, res) {
 	}
 };
 
-exports.getAllArticles = async function (req, res) {
+exports.indexArticles = async function (req, res) {
 	try {
-		const articles = await ArticleData.getAllArticles();
+		const articles = await ArticleData.indexArticles();
 		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
 };
 
-exports.getSingleArticle = async function (req, res) {
+exports.indexSecretArticles = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
+	try {
+		const articles = await ArticleData.indexArticles(true);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.getArticle = async function (req, res) {
 	const articleId = req.params.id;
 
 	try {
-		const article = await ArticleData.getSingleArticle(articleId);
+		const article = await ArticleData.getArticle(articleId);
 		return res.status(200).send(article);
 		
 	} catch (error) {
@@ -43,23 +56,26 @@ exports.getSingleArticle = async function (req, res) {
 	}
 };
 
-exports.patchArticle = async function (req, res) {
+exports.getSecretArticle = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
 	const articleId = req.params.id;
-	const patch = req.body;
 
 	try {
-		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
-
-		const article = await ArticleData.getSingleArticle(articleId, true);
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials", 
-			};
-		}
+		const article = await ArticleData.getArticle(articleId, true);
+		return res.status(200).send(article);
 	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
+		return res.status(error.status).send(error.message);
 	}
+};
+
+exports.patchArticle = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
+	const articleId = req.params.id;
+	const patch = req.body;
 	
 	try {
 		const article = await ArticleData.updateArticle(articleId, patch);
@@ -103,26 +119,61 @@ exports.incrementArticleDislikes = async function (req, res) {
 };
 
 exports.deleteArticle = async function (req, res) {
+	
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+
 	const articleId = req.params.id;
-
-	try {
-		const decoded = TokenHelper.verifyToken(req.headers.authorization.split(" ")[1]);
-
-		const article = await ArticleData.getSingleArticle(articleId, true);
-
-		if (article.author._id != decoded.data) {
-			throw {
-				status: 401,
-				message: "invalid credentials", 
-			};
-		}
-	} catch (error) {
-		return res.status(error.status || 401).send(error.message);
-	}
-
+	
 	try {
 		const article = await ArticleData.deleteArticle(articleId);
 		return res.status(203).send(article);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+/* tags */
+
+exports.indexArticlesByTag = async function (req, res) {
+	try {
+		const tagId = req.params.id;
+		const articles = await ArticleData.indexArticlesByTag(tagId);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.indexSecretArticlesByTag = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
+	try {
+		const tagId = req.params.id;
+		const articles = await ArticleData.indexArticlesByTag(tagId);
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.indexArticlesTags = async function (req, res) {
+	try {
+		const articles = await TagData.indexTags();
+		return res.status(200).send(articles);
+	} catch (error) {
+		return res.status(error.status).send(error.message);
+	}
+};
+
+exports.indexSecretArticlesTags = async function (req, res) {
+	const authenticated = await TokenHelper.authenticateRequest(req);
+	if(authenticated === false) return res.status(401).send("invalid credentials");
+	
+	try {
+		const articles = await TagData.indexTags(true);
+		return res.status(200).send(articles);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
 	}
