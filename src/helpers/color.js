@@ -3,7 +3,7 @@ const chroma = require("chroma-js");
 /**
  * Returns random color in hex format
  * @param {Object} options - options for color. `dark` (Boolean) darkens the color if true. `light` (Boolean) brightens the color if true.
- * @returns {String}
+ * @returns String
  */
 exports.getRandomColor = function(options = { dark: false, light: false }) {
 	const color = chroma.random();

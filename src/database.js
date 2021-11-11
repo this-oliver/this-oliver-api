@@ -5,10 +5,6 @@ process.env.MONGODB = process.env.DB_URI;
 
 exports.connection = Database.connection;
 
-exports.drop = async () => {
-	return Database.connection.dropDatabase();
-};
-
 exports.connect = async () => {
 	return await Database.connect(
 		process.env.MONGODB,
@@ -26,6 +22,10 @@ exports.connect = async () => {
 			}
 		}
 	);
+};
+
+exports.drop = async () => {
+	return Database.connection.dropDatabase();
 };
 
 exports.disconnect = async () => {

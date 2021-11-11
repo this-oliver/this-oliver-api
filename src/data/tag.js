@@ -1,4 +1,6 @@
 const TagSchema = require("../models/tag");
+const ArticleSchema = require("../models/article");
+const ColorHelper = require("../helpers/color");
 
 exports.createTag = async (name) => {
 	try {
@@ -14,25 +16,49 @@ exports.createTag = async (name) => {
 
 exports.indexTags = async (showSecrets = false) => {
 	try {
+		const tags = await TagSchema.find().exec();
+		
+		//! PATCH
+		for (let i = 0; i < tags.length; i++) {
+			const tag = tags[i];
+			if (!tag.color) {
+				tag.color = ColorHelper.getRandomColor({ light: true });
+				await tag.save();
+			}
+		}
+
+	} catch (error) {
+		throw {
+			status: 400,
+			message: error,
+		};
+	}
+
+
+	try {
 		if(showSecrets){
 			return await TagSchema.find().exec();
 		}
-
+		
 		else {
-			const tags = await TagSchema.aggregate([
-				{
-					$lookup: {
-						"from": "articles",
-						"localField": "_id",
-						"foreignField": "tags",
-						"as": "articles"
-					}
-				},
-				{ $match: { "articles.0": { $exists: true }, "articles.publish": true } },
-				{ $project: { articles: false } }
-			]).exec();
+			const publicTags = [];
+			const publicArticles = await ArticleSchema.find({ publish: true }).exec();
+			const tags = await TagSchema.find().exec();
 
-			return tags;
+			for(let i = 0; i < tags.length; i++){
+				const tag = tags[i];
+
+				for(let x = 0; x < publicArticles.length; x++){
+					const article = publicArticles[x];
+
+					if(article.tags.includes(tag._id)){
+						publicTags.push(tag);
+						break;
+					}
+				}
+			}
+
+			return publicTags;
 		}
 	} catch (error) {
 		throw {
@@ -81,13 +107,14 @@ exports.cleanTags = async (dirtyList) => {
 	}
 
 	try {
-		const cleanList = []; // list of tags
+		const cleanList = [];
 		const allTags = await this.indexTags();
 
 		for (let x = 0; x < dirtyList.length; x++) {
 			const dirtyTag = dirtyList[x];
 			let found = false;
 
+			// check if tag exists
 			for (let i = 0; i < allTags.length; i++) {
 				const cleanTag = allTags[i];
 				if (dirtyTag.toLowerCase() == cleanTag.name.toLowerCase()) {
@@ -97,6 +124,7 @@ exports.cleanTags = async (dirtyList) => {
 				}
 			}
 
+			// if tag is not found, add it to list
 			if (!found) {
 				const newTag = await this.createTag(dirtyTag);
 				cleanList.push(newTag._id);
