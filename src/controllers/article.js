@@ -158,7 +158,7 @@ exports.indexSecretArticlesByTag = async function (req, res) {
 	}
 };
 
-exports.indexArticlesTags = async function (req, res) {
+exports.indexTags = async function (req, res) {
 	try {
 		const articles = await TagData.indexTags();
 		return res.status(200).send(articles);
@@ -167,7 +167,7 @@ exports.indexArticlesTags = async function (req, res) {
 	}
 };
 
-exports.indexSecretArticlesTags = async function (req, res) {
+exports.indexSecretTags = async function (req, res) {
 	const authenticated = await TokenHelper.authenticateRequest(req);
 	if(authenticated === false) return res.status(401).send("invalid credentials");
 	
