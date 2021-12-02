@@ -17,7 +17,6 @@ exports.createTag = async (name) => {
 exports.indexTags = async (showSecrets = false) => {
 	try {
 		const tags = await TagSchema.find().exec();
-
 		//! PATCH
 		for (let i = 0; i < tags.length; i++) {
 			const tag = tags[i];

@@ -51,6 +51,7 @@ exports.getArticle = async function (req, res) {
 		return res.status(200).send(article);
 		
 	} catch (error) {
+		console.log(error);
 		return res.status(error.status).send(error.message);
 	}
 };

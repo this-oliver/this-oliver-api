@@ -51,6 +51,10 @@ exports.getUser = async (id) => {
 		const user = await User.findOne({ _id: id })
 			.select("-password -salt")
 			.populate("experiences")
+			.populate({
+				path: "articles",
+				populate: { path: "author tags" },
+			})
 			.exec();
 		return user;
 	} catch (error) {
