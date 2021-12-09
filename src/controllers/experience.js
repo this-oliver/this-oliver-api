@@ -3,13 +3,22 @@ const TokenHelper = require("../helpers/token");
 
 exports.postExperience = async function (req, res) {
 	const authenticated = await TokenHelper.authenticateRequest(req);
-	if(authenticated === false) return res.status(401).send("invalid credentials");
+	if (authenticated === false)
+		return res.status(401).send("invalid credentials");
 
 	const userId = TokenHelper.extractToken(req);
 	const data = req.body;
 
 	try {
-		const xp = await ExperienceData.postExperience(userId, data.title, data.org, data.startYear, data.endYear, data.description, data.type);
+		const xp = await ExperienceData.postExperience(
+			userId,
+			data.title,
+			data.org,
+			data.startYear,
+			data.endYear,
+			data.description,
+			data.type
+		);
 		return res.status(201).send(xp);
 	} catch (error) {
 		return res.status(error.status).send(error.message);
@@ -38,7 +47,8 @@ exports.getExperience = function (req, res) {
 
 exports.patchExperience = async function (req, res) {
 	const authenticated = await TokenHelper.authenticateRequest(req);
-	if(authenticated === false) return res.status(401).send("invalid credentials");
+	if (authenticated === false)
+		return res.status(401).send("invalid credentials");
 
 	const xpId = req.params.id;
 	const patch = req.body;
@@ -53,7 +63,8 @@ exports.patchExperience = async function (req, res) {
 
 exports.deleteExperience = async function (req, res) {
 	const authenticated = await TokenHelper.authenticateRequest(req);
-	if(authenticated === false) return res.status(401).send("invalid credentials");
+	if (authenticated === false)
+		return res.status(401).send("invalid credentials");
 
 	const xpId = req.params.id;
 
